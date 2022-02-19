@@ -32,18 +32,15 @@ npm run build
 The backend app expects the frontend static files to be found in the dist/frontend folder.
 ### Installation
 ```sh
-cd frontend
 npm i
 ```
 ### Running in Development
 ```sh
-cd frontend
 npm start
 ```
 
 ### Running Tests
 ```sh
-cd frontend
 npm run test
 ```
 
