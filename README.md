@@ -25,7 +25,7 @@ npm run test
 ### Generating Static Files for Backend
 ```sh
 cd frontend
-npm run build
+npm run build-for-backend
 ```
 
 ## Backend
