@@ -20,7 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build-for-backend": "npm run build && mv ./build ../dist/frontend",
+    "build-for-backend": "npm run build && rsync -a ./build/ ../dist/frontend",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

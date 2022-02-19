@@ -10,7 +10,6 @@ import { ENVIRONMENT, PORT } from './config'
 console.log(`App starting in ${ENVIRONMENT} mode`)
 
 const app = express()
-// app.use(cookieParser())
 
 app.use(express.static(path.join(__dirname, '..', 'dist/frontend')))
 app.use(express.static('public'))
