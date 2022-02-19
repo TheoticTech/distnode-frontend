@@ -1,8 +1,43 @@
-import React from 'react';
+// Third party
+import axios from 'axios'
+import React from 'react'; 
 import logo from './logo.svg';
 import './App.css';
 
+// Configurations
+import { API_URL, AUTH_URL } from './config'
+
 function App() {
+
+  const [loginRes, setLoginRes] = React.useState([])
+  const [whoamiRes, setWhoamiRes] = React.useState([])
+
+  const login = async()=>{
+    const response = await axios.post(
+      `${AUTH_URL}/auth/login`,
+      {
+        "email": "jd@distnode.com",
+        "password": "P@ssw0rd"
+      },
+      { withCredentials: true }
+    )
+
+    setLoginRes(response.data)    
+  }
+
+  const whoami = async()=>{
+    const response = await axios(
+      `${API_URL}/api/whoami`,
+      { withCredentials: true }
+    )
+    setWhoamiRes(response.data)    
+  }
+
+  React.useEffect(() => {
+    login();
+    whoami();
+  }, [])
+
   return (
     <div className="App">
       <header className="App-header">
@@ -10,14 +45,10 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>
+          loginRes: { loginRes }
+          whoamiRes: { whoamiRes }
+        </p>
       </header>
     </div>
   );
