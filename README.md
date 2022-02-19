@@ -34,7 +34,13 @@ The backend app expects the frontend static files to be found in the dist/fronte
 ```sh
 npm i
 ```
+
 ### Running in Development
+```sh
+npm run dev
+```
+
+### Running in Production
 ```sh
 npm start
 ```
