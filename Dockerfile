@@ -1,35 +1,25 @@
-# FRONTEND BUILD STAGE
-FROM node:17.4.0 as frontend_build
-
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install app dependencies using package.json and package-lock.json
-COPY frontend .
-RUN npm install
-RUN npm run build
-
-# SERVER BUILD STAGE
-FROM node:17.4.0 as serve
+## BUILD stage
+FROM node:17.4.0-alpine as build
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # Install app dependencies using package.json and package-lock.json
 COPY package*.json ./
-RUN npm ci --only=production
-RUN npm install typescript@4.5.5
+RUN npm ci
 
 # Bundle app source
 COPY . .
 
-# Copy frontend files
-RUN mkdir dist
-COPY --from=frontend_build /usr/src/app/build dist/frontend
+# Generate build artifacts
+RUN npm run build
 
-# Configure app to run in production mode
-ENV NODE_ENV=production
+## SERVE stage
+FROM nginx:stable-alpine
 
-# Execute app on port 3002
-EXPOSE 3002
-CMD [ "npm", "start" ]
+# Copy build artifacts from build stage
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
+# Execute app on port 80
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

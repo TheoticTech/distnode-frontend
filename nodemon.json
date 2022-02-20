@@ -1,9 +1,0 @@
-{
-    "verbose": true,
-    "exec": "cd frontend && npm run build-for-backend && cd .. && ts-node src/app.ts",
-    "watch": [
-      "src/",
-      "frontend/src/"
-    ],
-    "ext": "ts, tsx, css"
-}

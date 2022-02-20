@@ -1,53 +1,22 @@
 # Getting Started
-This consists of two parts, the first being the frontend static React app and the second being the backend Express app.
-The backend app will serve any static files found the dist/frontend folder.
 
-When building the [Dockerfile](./Dockerfile) image, the frontend static files will be built and copied to the final image.
-
-## Frontend
-### Installation
-```sh
-cd frontend
-npm i
-```
-### Running in Development
-```sh
-cd frontend
-npm start
-```
-
-### Running Tests
-```sh
-cd frontend
-npm run test
-```
-
-### Generating Static Files for Backend
-```sh
-cd frontend
-npm run build-for-backend
-```
-
-## Backend
-The backend app expects the frontend static files to be found in the dist/frontend folder.
-### Installation
+## Installation
 ```sh
 npm i
 ```
-
-### Running in Development
-```sh
-npm run dev
-```
-
-### Running in Production
+## Running in Development
 ```sh
 npm start
 ```
 
-### Running Tests
+## Running Tests
 ```sh
 npm run test
+```
+
+## Generating Build Artifacts
+```sh
+npm run build
 ```
 
 ## [Helpful Examples](./rest/frontend.rest)
