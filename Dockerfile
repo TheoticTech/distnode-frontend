@@ -12,6 +12,8 @@ RUN npm ci
 COPY . .
 
 # Generate build artifacts
+ARG API_URL=https://dev-api.distnode.com
+ARG AUTH_URL=https://dev-auth.distnode.com
 RUN npm run build
 
 ## SERVE stage
