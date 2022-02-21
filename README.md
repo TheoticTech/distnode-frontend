@@ -11,7 +11,7 @@ npm start
 
 ## Running Tests
 ```sh
-npm run test
+npm test
 ```
 
 ## Generating Build Artifacts
