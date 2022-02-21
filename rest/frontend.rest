@@ -1,12 +1,12 @@
-### Login - requires active auth service on localhost:3001
-POST http://localhost:3000/auth/login
-content-type: application/json
+# ### Login - requires active auth service on localhost:3001
+# POST http://localhost:3000/auth/login
+# content-type: application/json
 
-{
-    "email": "jd@distnode.com",
-    "password": "P@ssw0rd"
-}
+# {
+#     "email": "jd@distnode.com",
+#     "password": "P@ssw0rd"
+# }
 
-### Health - returns 200 OK if service is healthy
-GET http://localhost:3002/health
-content-type: application/json
+# ### Health - returns 200 OK if service is healthy
+# GET http://localhost:3002/health
+# content-type: application/json

@@ -20,6 +20,9 @@ FROM nginx:stable-alpine
 # Copy build artifacts from build stage
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
+# Copy nginx configuration from project files
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
 # Execute app on port 80
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
