@@ -74,47 +74,55 @@ function Login() {
               noValidate
               sx={{ input: { color: 'white' } }}
             >
-              <TextField
-                margin='normal'
-                required
-                fullWidth
-                id='email'
-                label='Email Address'
-                name='email'
-                autoComplete='email'
-              />
-              <TextField
-                margin='normal'
-                required
-                fullWidth
-                name='password'
-                label='Password'
-                type='password'
-                id='password'
-                autoComplete='current-password'
-              />
-              {errorMessage && (
-                <Typography variant='body2' color='error'>
-                  Error: {errorMessage}
-                </Typography>
-              )}
-              <Button
-                type='submit'
-                fullWidth
-                variant='contained'
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Login
-              </Button>
-              <Grid container alignItems='center' justifyContent='space-evenly'>
-                <Grid item>
+              <Grid container spacing={1}>
+                <Grid item xs={12}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='email'
+                    label='Email Address'
+                    name='email'
+                    autoComplete='email'
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    name='password'
+                    label='Password'
+                    type='password'
+                    id='password'
+                    autoComplete='current-password'
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  {errorMessage && (
+                    <Typography variant='body2' color='error'>
+                      Error: {errorMessage}
+                    </Typography>
+                  )}
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    type='submit'
+                    fullWidth
+                    variant='contained'
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Login
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
                   <Link href='#' variant='body2'>
                     Forgot password?
                   </Link>
                 </Grid>
-                <Grid item>
+                <Grid item xs={6}>
                   <Link href='/register' variant='body2'>
-                    Don&apos;t have account?
+                    Don&apos;t have an account?
                   </Link>
                 </Grid>
               </Grid>

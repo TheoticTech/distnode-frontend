@@ -18,5 +18,3 @@ npm test
 ```sh
 npm run build
 ```
-
-## [Helpful Examples](./rest/frontend.rest)

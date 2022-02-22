@@ -77,8 +77,8 @@ function Register() {
               noValidate
               sx={{ input: { color: 'white' } }}
             >
-              <Grid container>
-                <Grid item xs={5.5}>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
                   <TextField
                     margin='normal'
                     required
@@ -88,8 +88,7 @@ function Register() {
                     autoFocus
                   />
                 </Grid>
-                <Grid item xs={1}></Grid>
-                <Grid item xs={5.5}>
+                <Grid item xs={6}>
                   <TextField
                     margin='normal'
                     required
@@ -98,51 +97,59 @@ function Register() {
                     name='lastName'
                   />
                 </Grid>
-              </Grid>
-              <TextField
-                margin='normal'
-                required
-                fullWidth
-                id='username'
-                label='Username'
-                name='username'
-              />
-              <TextField
-                margin='normal'
-                required
-                fullWidth
-                id='email'
-                label='Email Address'
-                name='email'
-                autoComplete='email'
-              />
-              <TextField
-                margin='normal'
-                required
-                fullWidth
-                name='password'
-                label='Password'
-                type='password'
-                id='password'
-                autoComplete='current-password'
-              />
-              {errorMessage && (
-                <Typography variant='body2' color='error'>
-                  Error: {errorMessage}
-                </Typography>
-              )}
-              <Button
-                type='submit'
-                fullWidth
-                variant='contained'
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Register
-              </Button>
-              <Grid container alignItems='center' justifyContent='space-evenly'>
-                <Grid item>
+                <Grid item xs={12}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='username'
+                    label='Username'
+                    name='username'
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='email'
+                    label='Email Address'
+                    name='email'
+                    autoComplete='email'
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    name='password'
+                    label='Password'
+                    type='password'
+                    id='password'
+                    autoComplete='current-password'
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  {errorMessage && (
+                    <Typography variant='body2' color='error'>
+                      Error: {errorMessage}
+                    </Typography>
+                  )}
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    type='submit'
+                    fullWidth
+                    variant='contained'
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Register
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
                   <Link href='/login' variant='body2'>
-                    Already have account?
+                    Already have an account?
                   </Link>
                 </Grid>
               </Grid>
