@@ -77,8 +77,8 @@ function Register() {
               noValidate
               sx={{ input: { color: 'white' } }}
             >
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
+              <Grid container>
+                <Grid item xs={5.5}>
                   <TextField
                     margin='normal'
                     required
@@ -88,7 +88,8 @@ function Register() {
                     autoFocus
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={5.5}>
                   <TextField
                     margin='normal'
                     required
