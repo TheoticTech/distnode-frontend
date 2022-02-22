@@ -1,5 +1,6 @@
 // Third party
 import axios from 'axios'
+import Link from '@mui/material/Link'
 import React from 'react'
 
 // Local
@@ -25,13 +26,17 @@ function Home() {
     }
 
     getUserID()
-  })
+  }, [])
 
   return (
     <div className='App'>
       <img src={logo} className='App-logo' alt='logo' />
       {userID && <p>User ID: {userID}</p>}
-      {userID == '' && <a href='/login'>Login</a>}
+      {userID == '' && (
+        <Link href='/login' variant='h4'>
+          Login
+        </Link>
+      )}
     </div>
   )
 }
