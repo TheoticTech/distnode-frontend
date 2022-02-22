@@ -19,7 +19,7 @@ import '../style/base.css'
 import baseTheme from '../style/baseTheme'
 
 // Configurations
-import { AUTH_URL } from '../config'
+import { REACT_APP_AUTH_URL } from '../config'
 
 function Login() {
   const navigate = useNavigate()
@@ -31,7 +31,7 @@ function Login() {
 
     try {
       await axios.post(
-        `${AUTH_URL}/auth/login`,
+        `${REACT_APP_AUTH_URL}/auth/login`,
         {
           email: data.get('email'),
           password: data.get('password')

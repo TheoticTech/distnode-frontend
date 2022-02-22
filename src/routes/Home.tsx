@@ -1,13 +1,13 @@
 // Third party
 import axios from 'axios'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 // Local
 import logo from '../media/logo.svg'
 import '../style/base.css'
 
 // Configurations
-import { API_URL } from '../config'
+import { REACT_APP_API_URL } from '../config'
 
 function Home() {
   const [userID, setUserID] = React.useState('')
@@ -15,7 +15,7 @@ function Home() {
   React.useEffect(() => {
     const getUserID = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/api/whoami`, {
+        const { data } = await axios.get(`${REACT_APP_API_URL}/api/whoami`, {
           withCredentials: true
         })
         setUserID(data)

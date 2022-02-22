@@ -11,9 +11,11 @@ RUN npm ci
 # Bundle app source
 COPY . .
 
+# Configure API and AUTH URL endpoints
+ARG REACT_APP_API_URL=https://dev-api.distnode.com
+ARG REACT_APP_AUTH_URL=https://dev-auth.distnode.com
+
 # Generate build artifacts
-ARG API_URL=https://dev-api.distnode.com
-ARG AUTH_URL=https://dev-auth.distnode.com
 RUN npm run build
 
 ## SERVE stage

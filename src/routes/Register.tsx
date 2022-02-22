@@ -19,7 +19,7 @@ import '../style/base.css'
 import baseTheme from '../style/baseTheme'
 
 // Configurations
-import { AUTH_URL } from '../config'
+import { REACT_APP_AUTH_URL } from '../config'
 
 function Register() {
   const navigate = useNavigate()
@@ -31,7 +31,7 @@ function Register() {
 
     try {
       await axios.post(
-        `${AUTH_URL}/auth/register`,
+        `${REACT_APP_AUTH_URL}/auth/register`,
         {
           firstName: data.get('firstName'),
           lastName: data.get('lastName'),
