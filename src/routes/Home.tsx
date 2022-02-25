@@ -2,8 +2,11 @@
 import axios from 'axios'
 import Link from '@mui/material/Link'
 import React from 'react'
+import Typography from '@mui/material/Typography'
+import { useNavigate } from 'react-router-dom'
 
 // Local
+import authRefreshHandler from '../utils/authRefreshHandler'
 import logo from '../media/logo.svg'
 import '../style/base.css'
 
@@ -11,18 +14,24 @@ import '../style/base.css'
 import { REACT_APP_API_URL } from '../config'
 
 function Home() {
+  const navigate = useNavigate()
   const [userID, setUserID] = React.useState('')
+  const [errorMessage, setErrorMessage] = React.useState('')
 
   React.useEffect(() => {
     const getUserID = async () => {
-      try {
-        const { data } = await axios.get(`${REACT_APP_API_URL}/api/whoami`, {
-          withCredentials: true
-        })
-        setUserID(data)
-      } catch (err) {
-        console.error(err)
-      }
+      return await authRefreshHandler(
+        async () => {
+          const { data } = await axios.get(`${REACT_APP_API_URL}/api/whoami`, {
+            withCredentials: true
+          })
+          setUserID(data)
+        },
+        (apiCallError: any) => {
+          setErrorMessage(apiCallError.message)
+        },
+        navigate
+      )
     }
 
     getUserID()
@@ -33,9 +42,15 @@ function Home() {
       <img src={logo} className='App-logo' alt='logo' />
       {userID && <p>User ID: {userID}</p>}
       {userID == '' && (
-        <Link href='/login' variant='h4'>
+        <Link href='/auth/login' variant='h4'>
           Login
         </Link>
+      )}
+
+      {errorMessage && (
+        <Typography variant='body2' color='error'>
+          Error: {errorMessage}
+        </Typography>
       )}
     </div>
   )

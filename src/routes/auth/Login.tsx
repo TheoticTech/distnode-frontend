@@ -15,37 +15,34 @@ import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
-import '../style/base.css'
-import baseTheme from '../style/baseTheme'
+import '../../style/base.css'
+import baseTheme from '../../style/baseTheme'
 
 // Configurations
-import { REACT_APP_AUTH_URL } from '../config'
+import { REACT_APP_AUTH_URL } from '../../config'
 
-function Register() {
+function Login() {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
 
-  const register = async (loginFormData: React.FormEvent<HTMLFormElement>) => {
+  const login = async (loginFormData: React.FormEvent<HTMLFormElement>) => {
     loginFormData.preventDefault()
     const data = new FormData(loginFormData.currentTarget)
 
     try {
       await axios.post(
-        `${REACT_APP_AUTH_URL}/auth/register`,
+        `${REACT_APP_AUTH_URL}/auth/login`,
         {
-          firstName: data.get('firstName'),
-          lastName: data.get('lastName'),
-          username: data.get('username'),
-          email: data.get('email'),
+          email: data.get('email')?.toString().toLowerCase(),
           password: data.get('password')
         },
         { withCredentials: true }
       )
       navigate('/')
     } catch (err: any) {
-      const { registrationError } = err.response.data
-      if (registrationError) {
-        setErrorMessage(registrationError)
+      const loginError = err.response?.data?.loginError
+      if (loginError) {
+        setErrorMessage(loginError)
       } else {
         setErrorMessage('An unknown error occurred, please try again later')
       }
@@ -69,44 +66,15 @@ function Register() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
-              Register
+              Login
             </Typography>
             <Box
               component='form'
-              onSubmit={register}
+              onSubmit={login}
               noValidate
               sx={{ input: { color: 'white' } }}
             >
               <Grid container spacing={1}>
-                <Grid item xs={6}>
-                  <TextField
-                    margin='normal'
-                    required
-                    id='firstName'
-                    label='First Name'
-                    name='firstName'
-                    autoFocus
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    margin='normal'
-                    required
-                    id='lastName'
-                    label='Last Name'
-                    name='lastName'
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='username'
-                    label='Username'
-                    name='username'
-                  />
-                </Grid>
                 <Grid item xs={12}>
                   <TextField
                     margin='normal'
@@ -116,6 +84,7 @@ function Register() {
                     label='Email Address'
                     name='email'
                     autoComplete='email'
+                    autoFocus
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -144,12 +113,17 @@ function Register() {
                     variant='contained'
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Register
+                    Login
                   </Button>
                 </Grid>
-                <Grid item xs={12}>
-                  <Link href='/login' variant='body2'>
-                    Already have an account?
+                <Grid item xs={6}>
+                  <Link href='#' variant='body2'>
+                    Forgot password?
+                  </Link>
+                </Grid>
+                <Grid item xs={6}>
+                  <Link href='/auth/register' variant='body2'>
+                    Don&apos;t have an account?
                   </Link>
                 </Grid>
               </Grid>
@@ -161,4 +135,4 @@ function Register() {
   )
 }
 
-export default Register
+export default Login

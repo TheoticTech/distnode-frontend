@@ -6,7 +6,6 @@ import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
-import Link from '@mui/material/Link'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -15,36 +14,38 @@ import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
-import '../style/base.css'
-import baseTheme from '../style/baseTheme'
+import '../../style/base.css'
+import baseTheme from '../../style/baseTheme'
 
 // Configurations
-import { REACT_APP_AUTH_URL } from '../config'
+import { REACT_APP_AUTH_URL } from '../../config'
 
-function Login() {
+function Delete() {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
 
-  const login = async (loginFormData: React.FormEvent<HTMLFormElement>) => {
-    loginFormData.preventDefault()
-    const data = new FormData(loginFormData.currentTarget)
+  const confirmDelete = async (
+    deleteFormData: React.FormEvent<HTMLFormElement>
+  ) => {
+    deleteFormData.preventDefault()
+    const data = new FormData(deleteFormData.currentTarget)
 
-    try {
-      await axios.post(
-        `${REACT_APP_AUTH_URL}/auth/login`,
-        {
-          email: data.get('email'),
-          password: data.get('password')
-        },
-        { withCredentials: true }
-      )
-      navigate('/')
-    } catch (err: any) {
-      const { loginError } = err.response.data
-      if (loginError) {
-        setErrorMessage(loginError)
-      } else {
-        setErrorMessage('An unknown error occurred, please try again later')
+    if (window.confirm('Are you sure you want to delete your account?')) {
+      try {
+        await axios.delete(`${REACT_APP_AUTH_URL}/auth/delete-user`, {
+          data: {
+            email: data.get('email')?.toString().toLowerCase(),
+            password: data.get('password')
+          }
+        })
+        navigate('/')
+      } catch (err: any) {
+        const deleteUserError = err.response?.data?.deleteUserError
+        if (deleteUserError) {
+          setErrorMessage(deleteUserError)
+        } else {
+          setErrorMessage('An unknown error occurred, please try again later')
+        }
       }
     }
   }
@@ -66,11 +67,11 @@ function Login() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
-              Login
+              Delete Account
             </Typography>
             <Box
               component='form'
-              onSubmit={login}
+              onSubmit={confirmDelete}
               noValidate
               sx={{ input: { color: 'white' } }}
             >
@@ -84,6 +85,7 @@ function Login() {
                     label='Email Address'
                     name='email'
                     autoComplete='email'
+                    autoFocus
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -112,18 +114,8 @@ function Login() {
                     variant='contained'
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Login
+                    Delete Account
                   </Button>
-                </Grid>
-                <Grid item xs={6}>
-                  <Link href='#' variant='body2'>
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item xs={6}>
-                  <Link href='/register' variant='body2'>
-                    Don&apos;t have an account?
-                  </Link>
                 </Grid>
               </Grid>
             </Box>
@@ -134,4 +126,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Delete

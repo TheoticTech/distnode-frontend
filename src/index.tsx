@@ -6,16 +6,18 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // Local
 import './style/index.css'
 import Home from './routes/Home'
-import Login from './routes/Login'
-import Register from './routes/Register'
+import Delete from './routes/auth/Delete'
+import Login from './routes/auth/Login'
+import Register from './routes/auth/Register'
 
 render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
+        <Route path='/auth/delete-user' element={<Delete />} />
+        <Route path='/auth/login' element={<Login />} />
+        <Route path='/auth/register' element={<Register />} />
         <Route path='*' element={'Route not found'} />
       </Routes>
     </BrowserRouter>
