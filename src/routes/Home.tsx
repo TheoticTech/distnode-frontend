@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 import { useNavigate } from 'react-router-dom'
 
 // Local
-import authRefreshHandler from '../utils/authRefreshHandler'
+import { AuthError, apiHandler } from '../utils/apiHandler'
 import logo from '../media/logo.svg'
 import '../style/base.css'
 
@@ -20,18 +20,24 @@ function Home() {
 
   React.useEffect(() => {
     const getUserID = async () => {
-      return await authRefreshHandler(
-        async () => {
+      try {
+        return await apiHandler(async () => {
           const { data } = await axios.get(`${REACT_APP_API_URL}/api/whoami`, {
             withCredentials: true
           })
           setUserID(data)
-        },
-        (apiCallError: any) => {
-          setErrorMessage(apiCallError.message)
-        },
-        navigate
-      )
+        })
+      } catch (err: any) {
+        if (err instanceof AuthError) {
+          navigate('/auth/login')
+        } else {
+          if (err.message) {
+            setErrorMessage(err.message)
+          } else {
+            setErrorMessage(err)
+          }
+        }
+      }
     }
 
     getUserID()

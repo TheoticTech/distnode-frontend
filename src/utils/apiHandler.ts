@@ -4,17 +4,14 @@ import axios from 'axios'
 // Configurations
 import { REACT_APP_AUTH_URL } from '../config'
 
-// const authRefreshHandler = async () => {
-//   await axios.get(`${REACT_APP_AUTH_URL}/auth/refresh`, {
-//     withCredentials: true
-//   })
-// }
+class AuthError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'AuthError'
+  }
+}
 
-const authRefreshHandler = async (
-  apiCall: any,
-  errorHandler: any,
-  parentNavigation: any
-) => {
+const apiHandler = async (apiCall: any) => {
   try {
     return await apiCall()
   } catch (apiCallError: any) {
@@ -27,22 +24,17 @@ const authRefreshHandler = async (
             withCredentials: true
           })
         } catch (refreshError: any) {
-          console.log('Should re-login')
-          // parentNavigation('/auth/login')
+          throw new AuthError('Unable to refresh access token.')
         }
-        try {
-          return await apiCall()
-        } catch (apiCallRetryError) {
-          errorHandler(apiCallRetryError)
-        }
+
+        return await apiCall()
       } else {
-        console.log('Should re-login')
-        // parentNavigation('/auth/login')
+        throw new AuthError('Invalid or missing access token.')
       }
     } else {
-      errorHandler(apiCallError)
+      throw apiCallError
     }
   }
 }
 
-export default authRefreshHandler
+export { AuthError, apiHandler }
