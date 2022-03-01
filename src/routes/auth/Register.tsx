@@ -32,6 +32,9 @@ function Register() {
     const data = new FormData(registrationFormData.currentTarget)
 
     try {
+      if (data.get('password') !== data.get('passwordConfirmation')) {
+        throw new Error('Passwords do not match')
+      }
       await axios.post(
         `${REACT_APP_AUTH_URL}/auth/register`,
         {
@@ -48,6 +51,8 @@ function Register() {
       const registrationError = err.response?.data?.registrationError
       if (registrationError) {
         setErrorMessage(registrationError)
+      } else if (err.message === 'Passwords do not match') {
+        setErrorMessage(err.message)
       } else {
         setErrorMessage('An unknown error occurred, please try again later')
       }
@@ -129,6 +134,18 @@ function Register() {
                     label='Password'
                     type='password'
                     id='password'
+                    autoComplete='current-password'
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    name='passwordConfirmation'
+                    label='Confirm Password'
+                    type='password'
+                    id='passwordConfirmation'
                     autoComplete='current-password'
                   />
                 </Grid>
