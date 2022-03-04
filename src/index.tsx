@@ -18,6 +18,7 @@ render(
         <Route path='/auth/delete-user' element={<Delete />} />
         <Route path='/auth/login' element={<Login />} />
         <Route path='/auth/register' element={<Register />} />
+        <Route path='/health' element={'{"status":"ok"}'} />
         <Route path='*' element={'Route not found'} />
       </Routes>
     </BrowserRouter>
