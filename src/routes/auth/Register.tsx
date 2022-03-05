@@ -145,7 +145,7 @@ function Register() {
                     name='passwordConfirmation'
                     label='Confirm Password'
                     type='password'
-                    id='passwordConfirmation'
+                    id='password-confirmation'
                     autoComplete='current-password'
                   />
                 </Grid>
