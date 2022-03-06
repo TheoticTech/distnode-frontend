@@ -4,6 +4,7 @@ import axios from 'axios'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
+import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
@@ -32,16 +33,31 @@ function Delete() {
 
     if (window.confirm('Are you sure you want to delete your account?')) {
       try {
+        // First, ensure user has fresh CSRF token
+        await axios.post(
+          `${REACT_APP_AUTH_URL}/auth/login`,
+          {
+            email: data.get('email')?.toString().toLowerCase(),
+            password: data.get('password')
+          },
+          { withCredentials: true }
+        )
+        // Then, delete user account
         await axios.delete(`${REACT_APP_AUTH_URL}/auth/delete-user`, {
           data: {
             email: data.get('email')?.toString().toLowerCase(),
-            password: data.get('password')
-          }
+            password: data.get('password'),
+            csrfToken: Cookies.get('csrfToken')
+          },
+          withCredentials: true
         })
         navigate('/')
       } catch (err: any) {
+        const loginError = err.response?.data?.loginError
         const deleteUserError = err.response?.data?.deleteUserError
-        if (deleteUserError) {
+        if (loginError) {
+          setErrorMessage(loginError)
+        } else if (deleteUserError) {
           setErrorMessage(deleteUserError)
         } else {
           setErrorMessage('An unknown error occurred, please try again later')

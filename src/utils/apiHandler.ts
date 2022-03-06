@@ -20,7 +20,7 @@ const apiHandler = async (apiCall: any) => {
       if (apiCallAuthError === 'Expired access token') {
         console.log('Access token has expired. Attempting to refresh now...')
         try {
-          await axios.get(`${REACT_APP_AUTH_URL}/auth/refresh`, {
+          await axios.get(`${REACT_APP_AUTH_URL}/auth/refresh-access-token`, {
             withCredentials: true
           })
         } catch (refreshError: any) {
