@@ -4,7 +4,7 @@ import { createTheme } from '@mui/material/styles'
 const baseTheme = createTheme({
   palette: {
     primary: {
-      main: '#61DAFB'
+      main: '#1976D2'
     },
     secondary: {
       main: '#EA526F'
@@ -13,6 +13,22 @@ const baseTheme = createTheme({
   typography: {
     allVariants: {
       color: 'white'
+    }
+  },
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#61DAFB'
+        }
+      }
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: 'white'
+        }
+      }
     }
   }
 })

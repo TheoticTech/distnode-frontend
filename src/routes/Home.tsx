@@ -1,22 +1,18 @@
 // Third party
+import React from 'react'
 import axios from 'axios'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
-import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
-import Grid from '@mui/material/Grid'
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
-import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
 import { AuthError, apiHandler } from '../utils/apiHandler'
-import logo from '../media/logo.svg'
-import '../style/base.css'
 import baseTheme from '../style/baseTheme'
+import Navbar from '../components/Navbar'
+import '../style/base.css'
 
 // Configurations
 import { REACT_APP_API_URL } from '../config'
@@ -25,6 +21,11 @@ function Home() {
   const navigate = useNavigate()
   const [posts, setPosts] = React.useState([])
   const [errorMessage, setErrorMessage] = React.useState('')
+  const [shouldRefresh, setShouldRefresh] = React.useState(false)
+
+  const handleNewPost = () => {
+    setShouldRefresh(true)
+  }
 
   React.useEffect(() => {
     const getPosts = async () => {
@@ -34,6 +35,7 @@ function Home() {
             withCredentials: true
           })
           setPosts(data.posts)
+          setShouldRefresh(false)
         })
       } catch (err: any) {
         if (err instanceof AuthError) {
@@ -49,46 +51,25 @@ function Home() {
     }
 
     getPosts()
-  }, [])
-
-  const createPost = async (postData: React.FormEvent<HTMLFormElement>) => {
-    postData.preventDefault()
-    const data = new FormData(postData.currentTarget)
-
-    try {
-      return await apiHandler(async () => {
-        await axios.post(
-          `${REACT_APP_API_URL}/api/posts/create`,
-          {
-            title: data.get('title'),
-            body: data.get('body'),
-            visibility: 'public',
-            csrfToken: Cookies.get('csrfToken')
-          },
-          { withCredentials: true }
-        )
-        window.location.reload()
-      })
-    } catch (err: any) {
-      if (err instanceof AuthError) {
-        navigate('/auth/login')
-      } else {
-        if (err.message) {
-          setErrorMessage(err.message)
-        } else {
-          setErrorMessage(err)
-        }
-      }
-    }
-  }
+  }, [shouldRefresh])
 
   return (
-    <div className='App'>
-      <img src={logo} className='App-logo' alt='logo' />
+    <div>
+      <Navbar navbarCreatePostHandler={handleNewPost} />
+      <div className='App'>
+        <ThemeProvider theme={baseTheme}>
+          <Container component='main' maxWidth='xs'>
+            <CssBaseline />
+          </Container>
+        </ThemeProvider>
 
-      <ThemeProvider theme={baseTheme}>
-        <Container component='main' maxWidth='xs'>
-          <CssBaseline />
+        {errorMessage && (
+          <Typography variant='body2' color='error'>
+            Error: {errorMessage}
+          </Typography>
+        )}
+
+        {posts.map((post: any) => (
           <Box
             sx={{
               marginTop: 8,
@@ -96,61 +77,15 @@ function Home() {
               flexDirection: 'column',
               alignItems: 'center'
             }}
+            key={post.id}
           >
             <Typography component='h1' variant='h5'>
-              Create new post
+              {post.title}
             </Typography>
-            <Box
-              component='form'
-              onSubmit={createPost}
-              noValidate
-              sx={{ input: { color: 'white' } }}
-            >
-              <Grid container spacing={1}>
-                <Grid item xs={12}>
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='title'
-                    label='Title'
-                    name='title'
-                    autoFocus
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='body'
-                    label='Body'
-                    name='body'
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    type='submit'
-                    fullWidth
-                    variant='contained'
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    Post
-                  </Button>
-                </Grid>
-              </Grid>
-            </Box>
+            <Typography component='p'>{post.body}</Typography>
           </Box>
-        </Container>
-      </ThemeProvider>
-
-      {posts && <p>User ID: {JSON.stringify(posts)}</p>}
-
-      {errorMessage && (
-        <Typography variant='body2' color='error'>
-          Error: {errorMessage}
-        </Typography>
-      )}
+        ))}
+      </div>
     </div>
   )
 }
