@@ -5,11 +5,11 @@ import axios from 'axios'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
-import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
+import Link from '@mui/material/Link'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
@@ -21,47 +21,40 @@ import baseTheme from '../../style/baseTheme'
 // Configurations
 import { REACT_APP_AUTH_URL } from '../../config'
 
-function Delete() {
+function PasswordReset() {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
+  const [passwordResetSuccess, setPasswordResetSuccess] = React.useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const confirmDelete = async (
-    deleteFormData: React.FormEvent<HTMLFormElement>
+  const passwordReset = async (
+    passwordResetFormData: React.FormEvent<HTMLFormElement>
   ) => {
-    deleteFormData.preventDefault()
-    const data = new FormData(deleteFormData.currentTarget)
+    passwordResetFormData.preventDefault()
+    const data = new FormData(passwordResetFormData.currentTarget)
 
-    if (window.confirm('Are you sure you want to delete your account?')) {
-      try {
-        // First, ensure user has fresh CSRF token
-        await axios.post(
-          `${REACT_APP_AUTH_URL}/auth/login`,
-          {
-            email: data.get('email')?.toString().toLowerCase(),
-            password: data.get('password')
-          },
-          { withCredentials: true }
-        )
-        // Then, delete user account
-        await axios.delete(`${REACT_APP_AUTH_URL}/auth/user`, {
-          data: {
-            email: data.get('email')?.toString().toLowerCase(),
-            password: data.get('password'),
-            csrfToken: Cookies.get('csrfToken')
-          },
-          withCredentials: true
-        })
-        navigate('/')
-      } catch (err: any) {
-        const loginError = err.response?.data?.loginError
-        const deleteUserError = err.response?.data?.deleteUserError
-        if (loginError) {
-          setErrorMessage(loginError)
-        } else if (deleteUserError) {
-          setErrorMessage(deleteUserError)
-        } else {
-          setErrorMessage('An unknown error occurred, please try again later')
-        }
+    try {
+      if (data.get('password') !== data.get('passwordConfirmation')) {
+        throw new Error('Passwords do not match')
+      }
+      await axios.post(
+        `${REACT_APP_AUTH_URL}/auth/password-reset?token=${searchParams.get(
+          'token'
+        )}`,
+        {
+          password: data.get('password')
+        },
+        { withCredentials: true }
+      )
+      setPasswordResetSuccess(true)
+    } catch (err: any) {
+      const passwordResetError = err.response?.data?.passwordResetError
+      if (passwordResetError) {
+        setErrorMessage(passwordResetError)
+      } else if (err.message === 'Passwords do not match') {
+        setErrorMessage(err.message)
+      } else {
+        setErrorMessage('An unknown error occurred, please try again later')
       }
     }
   }
@@ -83,11 +76,11 @@ function Delete() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
-              Delete Account
+              Reset Password
             </Typography>
             <Box
               component='form'
-              onSubmit={confirmDelete}
+              onSubmit={passwordReset}
               noValidate
               sx={{ input: { color: 'white' } }}
             >
@@ -97,11 +90,11 @@ function Delete() {
                     margin='normal'
                     required
                     fullWidth
-                    id='email'
-                    label='Email Address'
-                    name='email'
-                    autoComplete='email'
-                    autoFocus
+                    name='password'
+                    label='New Password'
+                    type='password'
+                    id='password'
+                    autoComplete='current-password'
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -109,10 +102,10 @@ function Delete() {
                     margin='normal'
                     required
                     fullWidth
-                    name='password'
-                    label='Password'
+                    name='passwordConfirmation'
+                    label='Confirm Password'
                     type='password'
-                    id='password'
+                    id='password-confirmation'
                     autoComplete='current-password'
                   />
                 </Grid>
@@ -120,6 +113,11 @@ function Delete() {
                   {errorMessage && (
                     <Typography variant='body2' color='error'>
                       Error: {errorMessage}
+                    </Typography>
+                  )}
+                  {passwordResetSuccess && (
+                    <Typography variant='body2'>
+                      Password reset successful!
                     </Typography>
                   )}
                 </Grid>
@@ -130,8 +128,13 @@ function Delete() {
                     variant='contained'
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Delete Account
+                    Reset Password
                   </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Link href='/' variant='body2'>
+                    Home
+                  </Link>
                 </Grid>
               </Grid>
             </Box>
@@ -142,4 +145,4 @@ function Delete() {
   )
 }
 
-export default Delete
+export default PasswordReset

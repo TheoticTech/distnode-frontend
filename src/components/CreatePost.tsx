@@ -102,7 +102,7 @@ const CreatePost = ({ createPostHandler }: any) => {
                   variant='contained'
                   sx={{ mt: 3, mb: 2 }}
                 >
-                  Post
+                  Submit
                 </Button>
               </Grid>
             </Grid>
