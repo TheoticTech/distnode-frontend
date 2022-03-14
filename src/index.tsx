@@ -8,7 +8,9 @@ import './style/index.css'
 import Home from './routes/Home'
 import Delete from './routes/auth/Delete'
 import Login from './routes/auth/Login'
+import PasswordResetRequest from './routes/auth/PasswordResetRequest'
 import Register from './routes/auth/Register'
+import Account from './routes/auth/Account'
 import VerifyEmail from './routes/auth/VerifyEmail'
 import PasswordReset from './routes/auth/PasswordReset'
 
@@ -20,8 +22,13 @@ render(
         <Route path='/auth/delete-user' element={<Delete />} />
         <Route path='/auth/login' element={<Login />} />
         <Route path='/auth/register' element={<Register />} />
-        <Route path='/auth/verify-email' element={<VerifyEmail />} />
+        <Route
+          path='/auth/password-reset-request'
+          element={<PasswordResetRequest />}
+        />
         <Route path='/auth/password-reset' element={<PasswordReset />} />
+        <Route path='/auth/account' element={<Account />} />
+        <Route path='/auth/verify-email' element={<VerifyEmail />} />
         <Route path='/health' element={'{"status":"ok"}'} />
         <Route path='*' element={'Route not found'} />
       </Routes>

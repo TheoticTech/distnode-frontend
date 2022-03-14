@@ -7,7 +7,6 @@ import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
-import Link from '@mui/material/Link'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { useNavigate } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
@@ -21,28 +20,32 @@ import baseTheme from '../../style/baseTheme'
 // Configurations
 import { REACT_APP_AUTH_URL } from '../../config'
 
-function Login() {
-  const navigate = useNavigate()
+function PasswordResetRequest() {
+  const [passwordResetSuccess, setPasswordResetSuccess] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
 
-  const login = async (loginFormData: React.FormEvent<HTMLFormElement>) => {
-    loginFormData.preventDefault()
-    const data = new FormData(loginFormData.currentTarget)
-
+  const submitPasswordResetRequest = async (
+    forgotPasswordFormData: React.FormEvent<HTMLFormElement>
+  ) => {
+    forgotPasswordFormData.preventDefault()
+    const data = new FormData(forgotPasswordFormData.currentTarget)
+    console.log(
+      "data.get('email')?.toString().toLowerCase():",
+      data.get('email')?.toString().toLowerCase()
+    )
     try {
-      await axios.post(
-        `${REACT_APP_AUTH_URL}/auth/login`,
-        {
-          email: data.get('email')?.toString().toLowerCase(),
-          password: data.get('password')
-        },
-        { withCredentials: true }
+      await axios.get(
+        `${REACT_APP_AUTH_URL}/auth/password-reset?email=${data
+          .get('email')
+          ?.toString()
+          .toLowerCase()}`
       )
-      navigate('/')
+      setErrorMessage('')
+      setPasswordResetSuccess(true)
     } catch (err: any) {
-      const loginError = err.response?.data?.loginError
-      if (loginError) {
-        setErrorMessage(loginError)
+      const passwordResetError = err.response?.data?.passwordResetError
+      if (passwordResetError) {
+        setErrorMessage(passwordResetError)
       } else {
         setErrorMessage('An unknown error occurred, please try again later')
       }
@@ -66,11 +69,11 @@ function Login() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
-              Login
+              Reset Password
             </Typography>
             <Box
               component='form'
-              onSubmit={login}
+              onSubmit={submitPasswordResetRequest}
               noValidate
               sx={{ input: { color: 'white' } }}
             >
@@ -88,21 +91,16 @@ function Login() {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    name='password'
-                    label='Password'
-                    type='password'
-                    id='password'
-                    autoComplete='current-password'
-                  />
-                </Grid>
-                <Grid item xs={12}>
                   {errorMessage && (
                     <Typography variant='body2' color='error'>
                       Error: {errorMessage}
+                    </Typography>
+                  )}
+                </Grid>
+                <Grid item xs={12}>
+                  {passwordResetSuccess && (
+                    <Typography variant='body2'>
+                      Password reset email sent!
                     </Typography>
                   )}
                 </Grid>
@@ -113,18 +111,8 @@ function Login() {
                     variant='contained'
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Login
+                    Reset Password
                   </Button>
-                </Grid>
-                <Grid item xs={6}>
-                  <Link href='/auth/password-reset-request' variant='body2'>
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item xs={6}>
-                  <Link href='/auth/register' variant='body2'>
-                    Don&apos;t have an account?
-                  </Link>
                 </Grid>
               </Grid>
             </Box>
@@ -135,4 +123,4 @@ function Login() {
   )
 }
 
-export default Login
+export default PasswordResetRequest

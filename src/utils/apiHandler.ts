@@ -21,7 +21,7 @@ const apiHandler = async (apiCall: any) => {
       if (apiCallAuthError === 'Expired access token') {
         console.log('Access token has expired. Attempting to refresh now...')
         try {
-          await axios.get(`${REACT_APP_AUTH_URL}/auth/refresh-tokens`, {
+          await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
             withCredentials: true
           })
         } catch (refreshError: any) {
@@ -36,7 +36,7 @@ const apiHandler = async (apiCall: any) => {
       if (apiCallCSRFError === 'Expired CSRF token') {
         console.log('CSRF token has expired. Attempting to refresh now...')
         try {
-          await axios.get(`${REACT_APP_AUTH_URL}/auth/refresh-tokens`, {
+          await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
             withCredentials: true
           })
         } catch (refreshError: any) {

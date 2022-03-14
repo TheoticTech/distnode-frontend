@@ -15,9 +15,7 @@ test('renders home page elements', () => {
       </MemoryRouter>
     )
   })
-  const logo = screen.getByAltText(/logo/i)
-  expect(logo).toBeInTheDocument()
 
-  const loginLink = screen.getByRole('link', { name: 'Login' })
-  expect(loginLink).toHaveAttribute('href', '/auth/login')
+  const navbar = screen.getByTestId('navbar')
+  expect(navbar).toBeInTheDocument()
 })

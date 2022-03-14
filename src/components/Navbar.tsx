@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import InputBase from '@mui/material/InputBase'
 import Badge from '@mui/material/Badge'
+import Link from '@mui/material/Link'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -78,41 +79,45 @@ const modalStyle = {
   color: 'inherit'
 }
 
+const StyledMenuItemLink = styled(Link)(({ theme }) => ({
+  color: 'inherit',
+  textDecoration: 'none'
+}))
+
 const Navbar = ({ navbarCreatePostHandler }: any) => {
-  const [profileAnchorEl, setProfileAnchorEl] =
+  const [accountAnchorEl, setAccountAnchorEl] =
     React.useState<null | HTMLElement>(null)
-  const [createNewAnchorEl, setCreateNewAnchorEl] =
-    React.useState<null | HTMLElement>(null)
+  const [addAnchorEl, setAddAnchorEl] = React.useState<null | HTMLElement>(null)
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null)
-  const isCreateNewMenuOpen = Boolean(createNewAnchorEl)
-  const isProfileMenuOpen = Boolean(profileAnchorEl)
+  const isAddMenuOpen = Boolean(addAnchorEl)
+  const isAccountMenuOpen = Boolean(accountAnchorEl)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
   const [createPostModalOpen, setCreatePostModalOpen] = React.useState(false)
 
   // Modal handlers
   const handleCreatePostModalOpen = () => {
-    handleCreateNewMenuClose()
+    handleAddMenuClose()
     setCreatePostModalOpen(true)
   }
   const handleCreatePostModalClose = () => setCreatePostModalOpen(false)
 
   // Menu handlers
-  const handleCreateNewMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setCreateNewAnchorEl(event.currentTarget)
+  const handleAddMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAddAnchorEl(event.currentTarget)
   }
 
-  const handleCreateNewMenuClose = () => {
-    setCreateNewAnchorEl(null)
+  const handleAddMenuClose = () => {
+    setAddAnchorEl(null)
     handleMobileMenuClose()
   }
 
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setProfileAnchorEl(event.currentTarget)
+  const handleAccountMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAccountAnchorEl(event.currentTarget)
   }
 
-  const handleProfileMenuClose = () => {
-    setProfileAnchorEl(null)
+  const handleAccountMenuClose = () => {
+    setAccountAnchorEl(null)
     handleMobileMenuClose()
   }
 
@@ -124,47 +129,51 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
     setMobileMoreAnchorEl(event.currentTarget)
   }
 
-  const createNewMenuId = 'create-new-menu'
-  const renderCreateNewMenu = (
+  const addMenuId = 'create-new-menu'
+  const renderAddMenu = (
     <Menu
-      anchorEl={createNewAnchorEl}
+      anchorEl={addAnchorEl}
       anchorOrigin={{
         vertical: 'top',
         horizontal: 'right'
       }}
-      id={createNewMenuId}
+      id={addMenuId}
       keepMounted
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right'
       }}
-      open={isCreateNewMenuOpen}
-      onClose={handleCreateNewMenuClose}
+      open={isAddMenuOpen}
+      onClose={handleAddMenuClose}
     >
-      <MenuItem onClick={handleCreatePostModalOpen}>Create New Post</MenuItem>
-      <MenuItem onClick={handleCreateNewMenuClose}>Add Friend</MenuItem>
+      <MenuItem onClick={handleCreatePostModalOpen}>Post</MenuItem>
+      <MenuItem onClick={handleAddMenuClose}>Friend Request</MenuItem>
     </Menu>
   )
 
-  const profileMenuId = 'primary-search-account-menu'
-  const renderProfileMenu = (
+  const accountMenuId = 'primary-search-account-menu'
+  const renderAccountMenu = (
     <Menu
-      anchorEl={profileAnchorEl}
+      anchorEl={accountAnchorEl}
       anchorOrigin={{
         vertical: 'top',
         horizontal: 'right'
       }}
-      id={profileMenuId}
+      id={accountMenuId}
       keepMounted
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right'
       }}
-      open={isProfileMenuOpen}
-      onClose={handleProfileMenuClose}
+      open={isAccountMenuOpen}
+      onClose={handleAccountMenuClose}
     >
-      <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleProfileMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleAccountMenuClose}>
+        <StyledMenuItemLink href='/auth/profile'>Profile</StyledMenuItemLink>
+      </MenuItem>
+      <MenuItem onClick={handleAccountMenuClose}>
+        <StyledMenuItemLink href='/auth/account'>Settings</StyledMenuItemLink>
+      </MenuItem>
     </Menu>
   )
 
@@ -185,17 +194,17 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem onClick={handleCreateNewMenuOpen}>
+      <MenuItem onClick={handleAddMenuOpen}>
         <IconButton
           size='large'
           aria-label='create new'
-          aria-controls={createNewMenuId}
+          aria-controls={addMenuId}
           aria-haspopup='true'
           color='inherit'
         >
           <AddIcon />
         </IconButton>
-        <p>Profile</p>
+        <p>Add</p>
       </MenuItem>
       <MenuItem>
         <IconButton size='large' aria-label='show 4 new mails' color='inherit'>
@@ -217,23 +226,23 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
         </IconButton>
         <p>Notifications</p>
       </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
+      <MenuItem onClick={handleAccountMenuOpen}>
         <IconButton
           size='large'
           aria-label='account of current user'
-          aria-controls={profileMenuId}
+          aria-controls={accountMenuId}
           aria-haspopup='true'
           color='inherit'
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p>Account</p>
       </MenuItem>
     </Menu>
   )
 
   return (
-    <div>
+    <div data-testid='navbar'>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position='static' style={{ background: '#1976D2' }}>
           <Toolbar>
@@ -269,9 +278,9 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
                 size='large'
                 edge='end'
                 aria-label='create new'
-                aria-controls={createNewMenuId}
+                aria-controls={addMenuId}
                 aria-haspopup='true'
-                onClick={handleCreateNewMenuOpen}
+                onClick={handleAddMenuOpen}
                 color='inherit'
               >
                 <AddIcon />
@@ -298,9 +307,9 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
                 size='large'
                 edge='end'
                 aria-label='account of current user'
-                aria-controls={profileMenuId}
+                aria-controls={accountMenuId}
                 aria-haspopup='true'
-                onClick={handleProfileMenuOpen}
+                onClick={handleAccountMenuOpen}
                 color='inherit'
               >
                 <AccountCircle />
@@ -321,8 +330,8 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
           </Toolbar>
         </AppBar>
         {renderMobileMenu}
-        {renderCreateNewMenu}
-        {renderProfileMenu}
+        {renderAddMenu}
+        {renderAccountMenu}
       </Box>
       <Modal
         open={createPostModalOpen}

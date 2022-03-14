@@ -22,7 +22,6 @@ import baseTheme from '../../style/baseTheme'
 import { REACT_APP_AUTH_URL } from '../../config'
 
 function PasswordReset() {
-  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
   const [passwordResetSuccess, setPasswordResetSuccess] = React.useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -46,6 +45,7 @@ function PasswordReset() {
         },
         { withCredentials: true }
       )
+      setErrorMessage('')
       setPasswordResetSuccess(true)
     } catch (err: any) {
       const passwordResetError = err.response?.data?.passwordResetError
