@@ -21,11 +21,6 @@ function Home() {
   const navigate = useNavigate()
   const [posts, setPosts] = React.useState([])
   const [errorMessage, setErrorMessage] = React.useState('')
-  const [shouldRefresh, setShouldRefresh] = React.useState(false)
-
-  const handleNewPost = () => {
-    setShouldRefresh(true)
-  }
 
   React.useEffect(() => {
     const getPosts = async () => {
@@ -35,7 +30,6 @@ function Home() {
             withCredentials: true
           })
           setPosts(data.posts)
-          setShouldRefresh(false)
         })
       } catch (err: any) {
         if (err instanceof AuthError) {
@@ -51,11 +45,11 @@ function Home() {
     }
 
     getPosts()
-  }, [shouldRefresh])
+  }, [])
 
   return (
     <div>
-      <Navbar navbarCreatePostHandler={handleNewPost} />
+      <Navbar />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
           <Container component='main' maxWidth='xs'>

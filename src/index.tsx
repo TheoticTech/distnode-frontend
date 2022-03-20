@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 // Local
 import './style/index.css'
+import AddPost from './routes/AddPost'
 import Home from './routes/Home'
 import Delete from './routes/auth/Delete'
 import Login from './routes/auth/Login'
@@ -19,6 +20,7 @@ render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/posts/add' element={<AddPost />} />
         <Route path='/auth/delete-user' element={<Delete />} />
         <Route path='/auth/login' element={<Login />} />
         <Route path='/auth/register' element={<Register />} />

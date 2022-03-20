@@ -18,10 +18,6 @@ import MailIcon from '@mui/icons-material/Mail'
 import AddIcon from '@mui/icons-material/Add'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import MoreIcon from '@mui/icons-material/MoreVert'
-import Modal from '@mui/material/Modal'
-
-// Local
-import CreatePost from './CreatePost'
 
 // Configurations
 import { REACT_APP_NAME } from '../config'
@@ -66,25 +62,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   }
 }))
 
-const modalStyle = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: '#434343',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-  color: 'inherit'
-}
-
 const StyledMenuItemLink = styled(Link)(({ theme }) => ({
+  width: '100%',
   color: 'inherit',
   textDecoration: 'none'
 }))
 
-const Navbar = ({ navbarCreatePostHandler }: any) => {
+const Navbar = () => {
   const [accountAnchorEl, setAccountAnchorEl] =
     React.useState<null | HTMLElement>(null)
   const [addAnchorEl, setAddAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -93,14 +77,6 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
   const isAddMenuOpen = Boolean(addAnchorEl)
   const isAccountMenuOpen = Boolean(accountAnchorEl)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
-  const [createPostModalOpen, setCreatePostModalOpen] = React.useState(false)
-
-  // Modal handlers
-  const handleCreatePostModalOpen = () => {
-    handleAddMenuClose()
-    setCreatePostModalOpen(true)
-  }
-  const handleCreatePostModalClose = () => setCreatePostModalOpen(false)
 
   // Menu handlers
   const handleAddMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -146,7 +122,9 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
       open={isAddMenuOpen}
       onClose={handleAddMenuClose}
     >
-      <MenuItem onClick={handleCreatePostModalOpen}>Post</MenuItem>
+      <MenuItem onClick={handleAddMenuClose}>
+        <StyledMenuItemLink href='/posts/add'>Post</StyledMenuItemLink>
+      </MenuItem>
       <MenuItem onClick={handleAddMenuClose}>Friend Request</MenuItem>
     </Menu>
   )
@@ -333,21 +311,6 @@ const Navbar = ({ navbarCreatePostHandler }: any) => {
         {renderAddMenu}
         {renderAccountMenu}
       </Box>
-      <Modal
-        open={createPostModalOpen}
-        onClose={handleCreatePostModalClose}
-        aria-labelledby='modal-modal-title'
-        aria-describedby='modal-modal-description'
-      >
-        <Box sx={modalStyle}>
-          <CreatePost
-            createPostHandler={() => {
-              navbarCreatePostHandler()
-              handleCreatePostModalClose()
-            }}
-          />
-        </Box>
-      </Modal>
     </div>
   )
 }

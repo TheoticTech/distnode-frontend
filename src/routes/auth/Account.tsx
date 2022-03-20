@@ -4,7 +4,6 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import Link from '@mui/material/Link'
-import Typography from '@mui/material/Typography'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
@@ -14,15 +13,10 @@ import '../../style/base.css'
 
 function Account() {
   const [errorMessage, setErrorMessage] = React.useState('')
-  const [shouldRefresh, setShouldRefresh] = React.useState(false)
-
-  const handleNewPost = () => {
-    setShouldRefresh(true)
-  }
 
   return (
     <div>
-      <Navbar navbarCreatePostHandler={handleNewPost} />
+      <Navbar />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
           <Container component='main' maxWidth='xs'>
