@@ -18,7 +18,7 @@ import Navbar from '../components/Navbar'
 import '../style/base.css'
 
 // Configurations
-import { REACT_APP_API_URL } from '../config'
+import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
 
 // TinyMCE scope
 declare const tinymce: any
@@ -38,19 +38,24 @@ const AddPost = () => {
     const data = new FormData(postData.currentTarget)
 
     try {
-      return await apiHandler(async () => {
-        const result = await axios.post(
-          `${REACT_APP_API_URL}/api/posts/create`,
-          {
-            title: data.get('title'),
-            body: data.get('body'),
-            visibility: 'public',
-            csrfToken: Cookies.get('csrfToken')
-          },
-          { withCredentials: true }
-        )
-        navigate('/')
-      })
+      console.log('data:', data)
+      console.log(
+        'editorRef.current.getContent():',
+        editorRef.current.getContent()
+      )
+      // return await apiHandler(async () => {
+      //   const result = await axios.post(
+      //     `${REACT_APP_API_URL}/api/posts/add`,
+      //     {
+      //       title: data.get('title'),
+      //       body: data.get('body'),
+      //       visibility: 'public',
+      //       csrfToken: Cookies.get('csrfToken')
+      //     },
+      //     { withCredentials: true }
+      //   )
+      //   navigate('/')
+      // })
     } catch (err: any) {
       if (err instanceof AuthError) {
         navigate('/auth/login')
@@ -101,9 +106,10 @@ const AddPost = () => {
                 <Grid item xs={12}>
                   <Editor
                     // Files here need to have a recursive, public ACL
-                    tinymceScriptSrc='https://distnode-cdn.sfo3.digitaloceanspaces.com/tinymce/js/tinymce/tinymce.min.js'
+                    // s3cmd setacl $REACT_APP_STATIC_URL/tinymce --acl-public --recursive
+                    tinymceScriptSrc={`${REACT_APP_STATIC_URL}/tinymce/js/tinymce/tinymce.min.js`}
                     onInit={(evt, editor) => (editorRef.current = editor)}
-                    initialValue='<p>This is the initial content of the editor.</p>'
+                    initialValue=''
                     init={{
                       height: 500,
                       menubar: false,
@@ -136,32 +142,39 @@ const AddPost = () => {
                         'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                       media_live_embeds: true,
                       file_picker_types: 'image media',
-                      file_picker_callback: function (callback, value, meta) {
+                      file_picker_callback: async function (
+                        callback,
+                        value,
+                        meta
+                      ) {
                         const input = document.createElement('input') as any
                         input.setAttribute('type', 'file')
-                        input.setAttribute('accept', 'image/* video/* audio/*'),
-                          (input.onchange = function () {
-                            const file = this.files[0]
-                            const reader = new FileReader()
-                            reader.onload = function () {
-                              const id = 'blobid' + new Date().getTime()
-                              const blobCache =
-                                tinymce.activeEditor.editorUpload.blobCache
-                              const base64 = (reader.result as string).split(
-                                ','
-                              )[1]
-                              const blobInfo = blobCache.create(
-                                id,
-                                file,
-                                base64
+                        input.setAttribute('accept', 'image/* video/* audio/*')
+                        input.onchange = function () {
+                          const file = this.files[0]
+                          const reader = new FileReader()
+                          reader.onload = async function () {
+                            await apiHandler(async () => {
+                              const fd = new FormData()
+                              fd.append('media', file)
+                              fd.append(
+                                'csrfToken',
+                                Cookies.get('csrfToken') as string
                               )
-                              blobCache.add(blobInfo)
-                              callback(blobInfo.blobUri(), {
-                                title: file.name
+                              const response: any = await axios({
+                                method: 'post',
+                                url: `${REACT_APP_API_URL}/api/media/upload`,
+                                data: fd,
+                                withCredentials: true
                               })
-                            }
-                            reader.readAsDataURL(file)
-                          })
+                              console.log(response)
+                              callback(response.data.file.location, {
+                                title: response.data.file.originalname
+                              })
+                            })
+                          }
+                          reader.readAsDataURL(file)
+                        }
                         input.click()
                       },
                       onChange: { log }
