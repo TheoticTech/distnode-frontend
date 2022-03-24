@@ -38,29 +38,31 @@ const AddPost = () => {
     const data = new FormData(postData.currentTarget)
 
     try {
-      console.log('data:', data)
-      console.log(
-        'editorRef.current.getContent():',
-        editorRef.current.getContent()
-      )
-      // return await apiHandler(async () => {
-      //   const result = await axios.post(
-      //     `${REACT_APP_API_URL}/api/posts/add`,
-      //     {
-      //       title: data.get('title'),
-      //       body: data.get('body'),
-      //       visibility: 'public',
-      //       csrfToken: Cookies.get('csrfToken')
-      //     },
-      //     { withCredentials: true }
-      //   )
-      //   navigate('/')
-      // })
+      const content = editorRef.current.getContent()
+      if (!content) {
+        setErrorMessage('Post body must not be empty')
+      } else {
+        return await apiHandler(async () => {
+          const result = await axios.post(
+            `${REACT_APP_API_URL}/api/posts/add`,
+            {
+              title: data.get('title'),
+              body: editorRef.current.getContent(),
+              csrfToken: Cookies.get('csrfToken')
+            },
+            { withCredentials: true }
+          )
+          navigate('/')
+        })
+      }
     } catch (err: any) {
       if (err instanceof AuthError) {
         navigate('/auth/login')
       } else {
-        if (err.message) {
+        const addPostError = err.response?.data?.addPostError
+        if (addPostError) {
+          setErrorMessage(addPostError)
+        } else if (err.message) {
           setErrorMessage(err.message)
         } else {
           setErrorMessage(err)
@@ -118,13 +120,9 @@ const AddPost = () => {
                         'anchor',
                         'autolink',
                         'charmap',
-                        'code',
-                        'code',
                         'fullscreen',
-                        'help',
                         'image',
                         'insertdatetime',
-                        'link',
                         'lists',
                         'media',
                         'preview',
@@ -135,11 +133,11 @@ const AddPost = () => {
                       ],
                       toolbar:
                         'undo redo | formatselect | ' +
-                        'bold italic backcolor | alignleft aligncenter ' +
-                        'alignright alignjustify | bullist numlist outdent indent | ' +
-                        'removeformat | code | image | media | link | help',
+                        'bold italic strikethrough underline | backcolor | ' +
+                        'alignleft aligncenter alignright alignjustify | bullist numlist | ' +
+                        'outdent indent | image media',
                       content_style:
-                        'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                        'body { font-family:Roboto,Helvetica,Arial,sans-serif; font-size:14px }',
                       media_live_embeds: true,
                       file_picker_types: 'image media',
                       file_picker_callback: async function (

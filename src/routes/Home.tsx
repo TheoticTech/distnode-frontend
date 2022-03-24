@@ -2,11 +2,11 @@
 import React from 'react'
 import axios from 'axios'
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
-import { useNavigate } from 'react-router-dom'
+import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import { ThemeProvider } from '@mui/material/styles'
+import { useNavigate } from 'react-router-dom'
 
 // Local
 import { AuthError, apiHandler } from '../utils/apiHandler'
@@ -52,33 +52,24 @@ function Home() {
       <Navbar />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
-          <Container component='main' maxWidth='xs'>
+          <Box>
             <CssBaseline />
-          </Container>
-        </ThemeProvider>
-
-        {errorMessage && (
-          <Typography variant='body2' color='error'>
-            Error: {errorMessage}
-          </Typography>
-        )}
-
-        {posts.map((post: any) => (
-          <Box
-            sx={{
-              marginTop: 8,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center'
-            }}
-            key={post.id}
-          >
-            <Typography component='h1' variant='h5'>
-              {post.title}
-            </Typography>
-            <Typography component='p'>{post.body}</Typography>
+            {posts.map((post: any) => (
+              <Box key={post.id}>
+                <Grid item xs={12}>
+                  <Typography component='h3' variant='h3'>
+                    {post.title}
+                  </Typography>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: post.body
+                    }}
+                  />
+                </Grid>
+              </Box>
+            ))}
           </Box>
-        ))}
+        </ThemeProvider>
       </div>
     </div>
   )
