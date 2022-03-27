@@ -1,10 +1,8 @@
 // Third party
-import React from 'react'
 import axios from 'axios'
-import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
+import React from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import { useNavigate } from 'react-router-dom'
 
@@ -12,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { AuthError, apiHandler } from '../utils/apiHandler'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
+import PostFeed from '../components/PostFeed'
 import '../style/base.css'
 
 // Configurations
@@ -20,6 +19,7 @@ import { REACT_APP_API_URL } from '../config'
 function Home() {
   const navigate = useNavigate()
   const [posts, setPosts] = React.useState([])
+  const [userID, setUserID] = React.useState('')
   const [errorMessage, setErrorMessage] = React.useState('')
 
   React.useEffect(() => {
@@ -44,6 +44,21 @@ function Home() {
       }
     }
 
+    const getUserID = async () => {
+      try {
+        return await apiHandler(async () => {
+          const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
+            withCredentials: true
+          })
+          setUserID(data.userID)
+        })
+      } catch (err: any) {
+        console.log('User not logged in. Requesting login now.')
+        navigate('/auth/login')
+      }
+    }
+
+    getUserID()
     getPosts()
   }, [])
 
@@ -52,23 +67,10 @@ function Home() {
       <Navbar />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
-          <Box>
+          <Container component='main'>
             <CssBaseline />
-            {posts.map((post: any) => (
-              <Box key={post.id}>
-                <Grid item xs={12}>
-                  <Typography component='h3' variant='h3'>
-                    {post.title}
-                  </Typography>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: post.body
-                    }}
-                  />
-                </Grid>
-              </Box>
-            ))}
-          </Box>
+            <PostFeed posts={posts} userID={userID} />
+          </Container>
         </ThemeProvider>
       </div>
     </div>

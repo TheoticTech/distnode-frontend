@@ -51,10 +51,13 @@ function PasswordReset() {
       const passwordResetError = err.response?.data?.passwordResetError
       if (passwordResetError) {
         setErrorMessage(passwordResetError)
+        setPasswordResetSuccess(false)
       } else if (err.message === 'Passwords do not match') {
         setErrorMessage(err.message)
+        setPasswordResetSuccess(false)
       } else {
         setErrorMessage('An unknown error occurred, please try again later')
+        setPasswordResetSuccess(false)
       }
     }
   }

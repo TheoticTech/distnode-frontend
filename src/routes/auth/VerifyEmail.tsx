@@ -3,10 +3,10 @@ import React from 'react'
 import Avatar from '@mui/material/Avatar'
 import axios from 'axios'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
-import Link from '@mui/material/Link'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
@@ -82,9 +82,13 @@ function VerifyEmail() {
                 )}
               </Grid>
               <Grid item xs={12}>
-                <Link href='/' variant='body2'>
-                  Home
-                </Link>
+                <Button
+                  variant='contained'
+                  sx={{ mt: 2, width: '100%' }}
+                  href='/auth/login'
+                >
+                  Login
+                </Button>
               </Grid>
             </Grid>
           </Box>

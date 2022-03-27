@@ -33,3 +33,7 @@
 .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
   border-color: white;
 }
+
+.MuiCardHeader-action {
+  align-self: center !important;
+}

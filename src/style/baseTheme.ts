@@ -4,7 +4,7 @@ import { createTheme } from '@mui/material/styles'
 const baseTheme = createTheme({
   palette: {
     primary: {
-      main: '#1976D2'
+      main: '#4FC1F1'
     },
     secondary: {
       main: '#EA526F'
@@ -27,6 +27,13 @@ const baseTheme = createTheme({
       styleOverrides: {
         root: {
           color: 'white'
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#2C3741'
         }
       }
     }

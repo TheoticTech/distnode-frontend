@@ -11,7 +11,7 @@ import Delete from './routes/auth/Delete'
 import Login from './routes/auth/Login'
 import PasswordResetRequest from './routes/auth/PasswordResetRequest'
 import Register from './routes/auth/Register'
-import Account from './routes/auth/Account'
+import Profile from './routes/Profile'
 import VerifyEmail from './routes/auth/VerifyEmail'
 import PasswordReset from './routes/auth/PasswordReset'
 
@@ -20,6 +20,7 @@ render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/user/profile' element={<Profile />} />
         <Route path='/posts/add' element={<AddPost />} />
         <Route path='/auth/delete-user' element={<Delete />} />
         <Route path='/auth/login' element={<Login />} />
@@ -29,7 +30,6 @@ render(
           element={<PasswordResetRequest />}
         />
         <Route path='/auth/password-reset' element={<PasswordReset />} />
-        <Route path='/auth/account' element={<Account />} />
         <Route path='/auth/verify-email' element={<VerifyEmail />} />
         <Route path='/health' element={'{"status":"ok"}'} />
         <Route path='*' element={'Route not found'} />

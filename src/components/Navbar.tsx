@@ -7,11 +7,11 @@ import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import InputBase from '@mui/material/InputBase'
+import HomeIcon from '@mui/icons-material/Home'
 import Badge from '@mui/material/Badge'
 import Link from '@mui/material/Link'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
-import MenuIcon from '@mui/icons-material/Menu'
 import SearchIcon from '@mui/icons-material/Search'
 import AccountCircle from '@mui/icons-material/AccountCircle'
 import MailIcon from '@mui/icons-material/Mail'
@@ -63,40 +63,20 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 const StyledMenuItemLink = styled(Link)(({ theme }) => ({
-  width: '100%',
   color: 'inherit',
-  textDecoration: 'none'
+  textDecoration: 'none',
+  justifyContent: 'space-between',
+  verticalAlign: 'middle',
+  display: 'flex',
+  width: '100%'
 }))
 
 const Navbar = () => {
-  const [accountAnchorEl, setAccountAnchorEl] =
-    React.useState<null | HTMLElement>(null)
-  const [addAnchorEl, setAddAnchorEl] = React.useState<null | HTMLElement>(null)
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null)
-  const isAddMenuOpen = Boolean(addAnchorEl)
-  const isAccountMenuOpen = Boolean(accountAnchorEl)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
 
   // Menu handlers
-  const handleAddMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAddAnchorEl(event.currentTarget)
-  }
-
-  const handleAddMenuClose = () => {
-    setAddAnchorEl(null)
-    handleMobileMenuClose()
-  }
-
-  const handleAccountMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAccountAnchorEl(event.currentTarget)
-  }
-
-  const handleAccountMenuClose = () => {
-    setAccountAnchorEl(null)
-    handleMobileMenuClose()
-  }
-
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null)
   }
@@ -104,56 +84,6 @@ const Navbar = () => {
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMobileMoreAnchorEl(event.currentTarget)
   }
-
-  const addMenuId = 'create-new-menu'
-  const renderAddMenu = (
-    <Menu
-      anchorEl={addAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      id={addMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      open={isAddMenuOpen}
-      onClose={handleAddMenuClose}
-    >
-      <MenuItem onClick={handleAddMenuClose}>
-        <StyledMenuItemLink href='/posts/add'>Post</StyledMenuItemLink>
-      </MenuItem>
-      <MenuItem onClick={handleAddMenuClose}>Friend Request</MenuItem>
-    </Menu>
-  )
-
-  const accountMenuId = 'primary-search-account-menu'
-  const renderAccountMenu = (
-    <Menu
-      anchorEl={accountAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      id={accountMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      open={isAccountMenuOpen}
-      onClose={handleAccountMenuClose}
-    >
-      <MenuItem onClick={handleAccountMenuClose}>
-        <StyledMenuItemLink href='/auth/profile'>Profile</StyledMenuItemLink>
-      </MenuItem>
-      <MenuItem onClick={handleAccountMenuClose}>
-        <StyledMenuItemLink href='/auth/account'>Settings</StyledMenuItemLink>
-      </MenuItem>
-    </Menu>
-  )
 
   const mobileMenuId = 'primary-search-account-menu-mobile'
   const renderMobileMenu = (
@@ -172,49 +102,39 @@ const Navbar = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem onClick={handleAddMenuOpen}>
-        <IconButton
-          size='large'
-          aria-label='create new'
-          aria-controls={addMenuId}
-          aria-haspopup='true'
-          color='inherit'
-        >
-          <AddIcon />
-        </IconButton>
-        <p>Add</p>
+      <MenuItem>
+        <StyledMenuItemLink href='/'>
+          <HomeIcon />
+          <span style={{ paddingLeft: '4em' }}>Home</span>
+        </StyledMenuItemLink>
       </MenuItem>
       <MenuItem>
-        <IconButton size='large' aria-label='show 4 new mails' color='inherit'>
+        <StyledMenuItemLink href='/posts/add'>
+          <AddIcon />
+          <span style={{ paddingLeft: '4em' }}>Create Post</span>
+        </StyledMenuItemLink>
+      </MenuItem>
+      <MenuItem>
+        <StyledMenuItemLink href='/user/messages'>
           <Badge badgeContent={4} color='error'>
             <MailIcon />
           </Badge>
-        </IconButton>
-        <p>Messages</p>
+          <span style={{ paddingLeft: '4em' }}>Messages</span>
+        </StyledMenuItemLink>
       </MenuItem>
       <MenuItem>
-        <IconButton
-          size='large'
-          aria-label='show 17 new notifications'
-          color='inherit'
-        >
-          <Badge badgeContent={17} color='error'>
+        <StyledMenuItemLink href='/user/notifications'>
+          <Badge badgeContent={7} color='error'>
             <NotificationsIcon />
           </Badge>
-        </IconButton>
-        <p>Notifications</p>
+          <span style={{ paddingLeft: '4em' }}>Notifications</span>
+        </StyledMenuItemLink>
       </MenuItem>
-      <MenuItem onClick={handleAccountMenuOpen}>
-        <IconButton
-          size='large'
-          aria-label='account of current user'
-          aria-controls={accountMenuId}
-          aria-haspopup='true'
-          color='inherit'
-        >
+      <MenuItem>
+        <StyledMenuItemLink href='/user/profile'>
           <AccountCircle />
-        </IconButton>
-        <p>Account</p>
+          <span style={{ paddingLeft: '4em' }}>Profile</span>
+        </StyledMenuItemLink>
       </MenuItem>
     </Menu>
   )
@@ -224,22 +144,13 @@ const Navbar = () => {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position='static' style={{ background: '#1976D2' }}>
           <Toolbar>
-            <IconButton
-              size='large'
-              edge='start'
-              color='inherit'
-              aria-label='open drawer'
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
             <Typography
               variant='h6'
               noWrap
               component='div'
               sx={{ display: { xs: 'none', sm: 'block' } }}
             >
-              {REACT_APP_NAME}
+              <StyledMenuItemLink href='/'>{REACT_APP_NAME}</StyledMenuItemLink>
             </Typography>
             <Search>
               <SearchIconWrapper>
@@ -252,16 +163,10 @@ const Navbar = () => {
             </Search>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <IconButton
-                size='large'
-                edge='end'
-                aria-label='create new'
-                aria-controls={addMenuId}
-                aria-haspopup='true'
-                onClick={handleAddMenuOpen}
-                color='inherit'
-              >
-                <AddIcon />
+              <IconButton size='large' aria-label='create new' color='inherit'>
+                <StyledMenuItemLink href='/posts/add'>
+                  <AddIcon />
+                </StyledMenuItemLink>
               </IconButton>
               <IconButton
                 size='large'
@@ -283,14 +188,12 @@ const Navbar = () => {
               </IconButton>
               <IconButton
                 size='large'
-                edge='end'
-                aria-label='account of current user'
-                aria-controls={accountMenuId}
-                aria-haspopup='true'
-                onClick={handleAccountMenuOpen}
+                aria-label='user profile'
                 color='inherit'
               >
-                <AccountCircle />
+                <StyledMenuItemLink href='/user/profile'>
+                  <AccountCircle />
+                </StyledMenuItemLink>
               </IconButton>
             </Box>
             <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
@@ -308,8 +211,6 @@ const Navbar = () => {
           </Toolbar>
         </AppBar>
         {renderMobileMenu}
-        {renderAddMenu}
-        {renderAccountMenu}
       </Box>
     </div>
   )
