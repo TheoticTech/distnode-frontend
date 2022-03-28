@@ -53,8 +53,7 @@ function Home() {
           setUserID(data.userID)
         })
       } catch (err: any) {
-        console.log('User not logged in. Requesting login now.')
-        navigate('/auth/login')
+        console.log('User not logged in. Viewing in guest mode.')
       }
     }
 
@@ -67,7 +66,16 @@ function Home() {
       <Navbar />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
-          <Container component='main'>
+          <Container
+            component='main'
+            maxWidth={false}
+            sx={{
+              my: 7,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <CssBaseline />
             <PostFeed posts={posts} userID={userID} />
           </Container>

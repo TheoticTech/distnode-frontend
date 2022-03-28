@@ -92,11 +92,11 @@ const AddPost = () => {
       <Navbar />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
-          <Container component='main' maxWidth='xs'>
+          <Container component='main'>
             <CssBaseline />
             <Box
               sx={{
-                marginTop: 2,
+                mt: 2,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
@@ -162,14 +162,13 @@ const AddPost = () => {
                           'searchreplace',
                           'table',
                           'visualblocks',
-                          'wordcount',
-                          'code'
+                          'wordcount'
                         ],
                         toolbar:
                           'undo redo | formatselect | ' +
                           'bold italic strikethrough underline | backcolor | ' +
                           'alignleft aligncenter alignright alignjustify | bullist numlist | ' +
-                          'outdent indent | image media | code',
+                          'outdent indent | image media',
                         content_style:
                           'body { font-family:Roboto,Helvetica,Arial,sans-serif; font-size:14px }',
                         // paste_as_text: true, // uncomment to disable formatting on paste
