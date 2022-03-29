@@ -38,8 +38,8 @@ function Profile() {
   const [userInfo, setUserInfo] = React.useState({
     username: '',
     userCreatedAt: Date.now(),
-    userBio: '',
-    userAvatar: ''
+    bio: '',
+    avatar: ''
   })
   const [posts, setPosts] = React.useState([])
   const [errorMessage, setErrorMessage] = React.useState('')
@@ -48,10 +48,12 @@ function Profile() {
   const { userID } = useParams() // userID from URL
   const open = Boolean(profileOptionsMenuEl)
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleProfileMenuButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     setProfileOptionsMenuEl(event.currentTarget)
   }
-  const handleClose = () => {
+  const handleProfileMenuClose = () => {
     setProfileOptionsMenuEl(null)
   }
 
@@ -130,7 +132,7 @@ function Profile() {
                               color: '#4FC1F1'
                             }
                           }}
-                          onClick={handleClick}
+                          onClick={handleProfileMenuButtonClick}
                         >
                           <MoreVertIcon />
                         </IconButton>
@@ -139,14 +141,14 @@ function Profile() {
                         id='profile-options-menu'
                         anchorEl={profileOptionsMenuEl}
                         open={open}
-                        onClose={handleClose}
+                        onClose={handleProfileMenuClose}
                         MenuListProps={{
                           'aria-labelledby': 'profile-options-button'
                         }}
                       >
                         <MenuItem
                           onClick={() => {
-                            handleClose()
+                            handleProfileMenuClose()
                             navigate(`/user/${activeUserID}/edit`)
                           }}
                         >
@@ -154,7 +156,7 @@ function Profile() {
                         </MenuItem>
                         <MenuItem
                           onClick={async () => {
-                            handleClose()
+                            handleProfileMenuClose()
                             await axios.post(
                               `${REACT_APP_AUTH_URL}/auth/logout`,
                               {},
@@ -168,7 +170,7 @@ function Profile() {
                         <Divider />
                         <MenuItem
                           onClick={() => {
-                            handleClose()
+                            handleProfileMenuClose()
                             navigate('/auth/delete-user')
                           }}
                           sx={{ color: 'red' }}
@@ -189,21 +191,23 @@ function Profile() {
                     <Grid item md={4} xs={12}>
                       <img
                         src={
-                          userInfo.userAvatar ||
+                          userInfo.avatar ||
                           `${REACT_APP_STATIC_URL}/resources/default-avatar.png`
                         }
                         style={{ width: '70%', borderRadius: '100%' }}
                       />
-                      <Button
-                        color='primary'
-                        variant='contained'
-                        component='span'
-                        onClick={() => {
-                          navigate(`/user/${activeUserID}/edit`)
-                        }}
-                      >
-                        Select Profile Picture
-                      </Button>
+                      {activeUserID === userID && !userInfo.avatar && (
+                        <Button
+                          color='primary'
+                          variant='contained'
+                          component='span'
+                          onClick={() => {
+                            navigate(`/user/${activeUserID}/edit`)
+                          }}
+                        >
+                          Select Profile Picture
+                        </Button>
+                      )}
                     </Grid>
                     <Grid
                       item
@@ -224,13 +228,25 @@ function Profile() {
                             .duration(userInfo.userCreatedAt - Date.now())
                             .humanize(true)}`}
                         </Typography>
-                        {userInfo.userBio && (
+                        {userInfo.bio && (
                           <div>
                             <Divider />
                             <Typography variant='body2' fontStyle='italic'>
-                              {userInfo.userBio}
+                              {userInfo.bio}
                             </Typography>
                           </div>
+                        )}
+                        {activeUserID === userID && !userInfo.bio && (
+                          <Button
+                            color='primary'
+                            variant='contained'
+                            component='span'
+                            onClick={() => {
+                              navigate(`/user/${activeUserID}/edit`)
+                            }}
+                          >
+                            Add Bio
+                          </Button>
                         )}
                       </Stack>
                     </Grid>

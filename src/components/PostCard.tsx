@@ -22,8 +22,7 @@ function PostCard({
   title,
   createdAt,
   description,
-  linkHref,
-  linkText
+  linkHref
 }: any) {
   return (
     <Card>

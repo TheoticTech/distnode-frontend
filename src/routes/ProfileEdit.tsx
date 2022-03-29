@@ -21,18 +21,15 @@ import '../style/base.css'
 // Configurations
 import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
 
+// Constants
+const DEFAULT_AVATAR_URL = `${REACT_APP_STATIC_URL}/resources/default-avatar.png`
+
 const AddPost = () => {
   const navigate = useNavigate()
   const [activeUserID, setActiveUserID] = React.useState('')
   const [errorMessage, setErrorMessage] = React.useState('')
-  const [formAvatar, setFormAvatar] = React.useState('')
-  const [formBio, setFormBio] = React.useState('')
-  const [userInfo, setUserInfo] = React.useState({
-    username: '',
-    userCreatedAt: Date.now(),
-    userBio: '',
-    userAvatar: ''
-  })
+  const [bio, setBio] = React.useState('')
+  const [avatar, setAvatar] = React.useState(DEFAULT_AVATAR_URL)
   const { userID } = useParams() // userID from URL
 
   React.useEffect(() => {
@@ -43,6 +40,9 @@ const AddPost = () => {
             withCredentials: true
           })
           setActiveUserID(data.userID)
+          if (data.userID !== userID) {
+            navigate(-1)
+          }
         })
       } catch (err: any) {
         console.log('Not logged in. Requesting login now.')
@@ -57,7 +57,9 @@ const AddPost = () => {
             `${REACT_APP_API_URL}/api/user/${userID}/profile`,
             {}
           )
-          setUserInfo(data.user)
+          const { bio, avatar } = data.user
+          setBio(bio)
+          setAvatar(avatar)
         })
       } catch (err: any) {
         const getUserProfileError = err.response?.data?.getUserProfileError
@@ -77,36 +79,42 @@ const AddPost = () => {
     getUserData()
   }, [])
 
-  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      // TODO: Upload image
-      // setProfileImage(e.target.files[0])
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      await apiHandler(async () => {
+        const fd = new FormData()
+        fd.append('media', e.target.files![0])
+        fd.append('csrfToken', Cookies.get('csrfToken') as string)
+        const response: any = await axios({
+          method: 'post',
+          url: `${REACT_APP_API_URL}/api/media/upload`,
+          data: fd,
+          withCredentials: true
+        })
+        setAvatar(response.data.file.location)
+      })
     }
   }
 
-  const editProfile = async (postData: React.FormEvent<HTMLFormElement>) => {
-    postData.preventDefault()
-    const data = new FormData(postData.currentTarget)
+  const editProfile = async (
+    editProfileData: React.FormEvent<HTMLFormElement>
+  ) => {
+    editProfileData.preventDefault()
+    const data = new FormData(editProfileData.currentTarget)
 
     try {
-      const content = undefined
-      if (!content) {
-        setErrorMessage('Post body must not be empty')
-      } else {
-        return await apiHandler(async () => {
-          const result = await axios.post(
-            `${REACT_APP_API_URL}/api/posts/add`,
-            {
-              title: data.get('title'),
-              description: data.get('description'),
-              body: '',
-              csrfToken: Cookies.get('csrfToken')
-            },
-            { withCredentials: true }
-          )
-          navigate('/')
-        })
-      }
+      return await apiHandler(async () => {
+        const result = await axios.post(
+          `${REACT_APP_API_URL}/api/user/${userID}/profile/edit`,
+          {
+            ...(data.get('bio') && { bio: data.get('bio') }),
+            ...(avatar !== DEFAULT_AVATAR_URL && { avatar }),
+            csrfToken: Cookies.get('csrfToken')
+          },
+          { withCredentials: true }
+        )
+        navigate(`/user/${userID}`)
+      })
     } catch (err: any) {
       if (err instanceof AuthError) {
         navigate('/auth/login')
@@ -150,10 +158,7 @@ const AddPost = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <img
-                      src={
-                        userInfo.userAvatar ||
-                        `${REACT_APP_STATIC_URL}/resources/default-avatar.png`
-                      }
+                      src={avatar}
                       style={{
                         width: '70%',
                         borderRadius: '100%',
@@ -166,8 +171,8 @@ const AddPost = () => {
                         id='uploadAvatar'
                         name='uploadAvatar'
                         type='file'
+                        onChange={onImageChange}
                       />
-
                       <Button
                         color='secondary'
                         variant='contained'
@@ -189,6 +194,8 @@ const AddPost = () => {
                       id='bio'
                       label='Bio'
                       name='bio'
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
                       autoFocus
                     />
                   </Grid>

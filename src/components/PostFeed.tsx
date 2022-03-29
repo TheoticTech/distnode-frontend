@@ -14,13 +14,12 @@ function PostFeed({ activeUserID, posts }: any) {
           activeUserID={activeUserID}
           authorUserID={post.userID}
           authorUsername={post.username}
-          avatarSrc={post.userAvatar}
+          avatarSrc={post.avatar}
           headerImageSrc='https://distnode-static-dev.sfo3.digitaloceanspaces.com/uploads/paella.jpg'
           title={post.title}
           createdAt={post.postCreatedAt}
           description={post.description}
           linkHref={`/post/${post.postID}`}
-          linkText='Read more'
         />
       ))}
     </Masonry>
