@@ -71,7 +71,7 @@ const StyledMenuItemLink = styled(Link)(({ theme }) => ({
   width: '100%'
 }))
 
-const Navbar = () => {
+const Navbar = ({ activeUserID }: any) => {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
@@ -152,15 +152,20 @@ const Navbar = () => {
             >
               <StyledMenuItemLink href='/'>{REACT_APP_NAME}</StyledMenuItemLink>
             </Typography>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder='Search…'
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </Search>
+
+            {/*
+              // Search not implemented yet
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder='Search…'
+                  inputProps={{ 'aria-label': 'search' }}
+                />
+              </Search>
+            */}
+
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
               <IconButton size='large' aria-label='create new' color='inherit'>
@@ -168,32 +173,47 @@ const Navbar = () => {
                   <AddIcon />
                 </StyledMenuItemLink>
               </IconButton>
-              <IconButton
-                size='large'
-                aria-label='show 4 new mails'
-                color='inherit'
-              >
-                <Badge badgeContent={4} color='error'>
-                  <MailIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                size='large'
-                aria-label='show 17 new notifications'
-                color='inherit'
-              >
-                <Badge badgeContent={17} color='error'>
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
+
+              {/*
+                // Messages not implemented yet
+                <IconButton
+                  size='large'
+                  aria-label='show 4 new messages'
+                  color='inherit'
+                >
+                  <Badge badgeContent={4} color='error'>
+                    <MailIcon />
+                  </Badge>
+                </IconButton>
+              */}
+
+              {/*
+                // Notifications not implemented yet
+                <IconButton
+                  size='large'
+                  aria-label='show 17 new notifications'
+                  color='inherit'
+                >
+                  <Badge badgeContent={17} color='error'>
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+              */}
+
               <IconButton
                 size='large'
                 aria-label='user profile'
                 color='inherit'
               >
-                <StyledMenuItemLink href='/user/profile'>
-                  <AccountCircle />
-                </StyledMenuItemLink>
+                {activeUserID ? (
+                  <StyledMenuItemLink href={`/user/${activeUserID}`}>
+                    <AccountCircle />
+                  </StyledMenuItemLink>
+                ) : (
+                  <StyledMenuItemLink href='/auth/login'>
+                    <AccountCircle />
+                  </StyledMenuItemLink>
+                )}
               </IconButton>
             </Box>
             <Box sx={{ display: { xs: 'flex', md: 'none' } }}>

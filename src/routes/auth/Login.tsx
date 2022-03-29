@@ -9,7 +9,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
 import Link from '@mui/material/Link'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
@@ -24,13 +24,14 @@ import { REACT_APP_AUTH_URL } from '../../config'
 function Login() {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
+  const { state }: any = useLocation()
 
   const login = async (loginFormData: React.FormEvent<HTMLFormElement>) => {
     loginFormData.preventDefault()
     const data = new FormData(loginFormData.currentTarget)
 
     try {
-      await axios.post(
+      const loginRes = await axios.post(
         `${REACT_APP_AUTH_URL}/auth/login`,
         {
           email: data.get('email')?.toString().toLowerCase(),
@@ -38,7 +39,12 @@ function Login() {
         },
         { withCredentials: true }
       )
-      navigate('/')
+
+      if (state?.next) {
+        navigate(state.next)
+      } else {
+        navigate(`/user/${loginRes.data.userID}`)
+      }
     } catch (err: any) {
       const loginError = err.response?.data?.loginError
       if (loginError) {

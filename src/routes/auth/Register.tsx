@@ -94,7 +94,7 @@ function Register() {
               Registration
             </Typography>
 
-            {emailSent && (
+            {emailSent ? (
               <Box
                 component='form'
                 onSubmit={register}
@@ -129,9 +129,7 @@ function Register() {
                   </Grid>
                 </Grid>
               </Box>
-            )}
-
-            {!emailSent && (
+            ) : (
               <Box
                 component='form'
                 onSubmit={register}

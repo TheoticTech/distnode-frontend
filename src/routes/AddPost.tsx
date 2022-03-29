@@ -27,25 +27,25 @@ declare const tinymce: any
 
 const AddPost = () => {
   const navigate = useNavigate()
-  const [userID, setUserID] = React.useState('')
+  const [activeUserID, setActiveUserID] = React.useState('')
   const [errorMessage, setErrorMessage] = React.useState('')
   const editorRef = React.useRef<any>(null)
 
   React.useEffect(() => {
-    const getUserID = async () => {
+    const getActiveUserID = async () => {
       try {
         return await apiHandler(async () => {
           const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
             withCredentials: true
           })
-          setUserID(data.userID)
+          setActiveUserID(data.userID)
         })
       } catch (err: any) {
-        console.log('User not logged in. Requesting login now.')
-        navigate('/auth/login')
+        console.log('Not logged in. Requesting login now.')
+        navigate('/auth/login', { state: { next: '/posts/add' } })
       }
     }
-    getUserID()
+    getActiveUserID()
   }, [])
 
   const addPost = async (postData: React.FormEvent<HTMLFormElement>) => {
@@ -89,7 +89,7 @@ const AddPost = () => {
 
   return (
     <div>
-      <Navbar />
+      <Navbar activeUserID={activeUserID} />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
           <Container component='main'>

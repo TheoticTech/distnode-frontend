@@ -12,6 +12,7 @@ import Login from './routes/auth/Login'
 import PasswordResetRequest from './routes/auth/PasswordResetRequest'
 import Register from './routes/auth/Register'
 import Profile from './routes/Profile'
+import ProfileEdit from './routes/ProfileEdit'
 import VerifyEmail from './routes/auth/VerifyEmail'
 import PasswordReset from './routes/auth/PasswordReset'
 
@@ -20,7 +21,8 @@ render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/user/profile' element={<Profile />} />
+        <Route path='/user/:userID' element={<Profile />} />
+        <Route path='/user/:userID/edit' element={<ProfileEdit />} />
         <Route path='/posts/add' element={<AddPost />} />
         <Route path='/auth/delete-user' element={<Delete />} />
         <Route path='/auth/login' element={<Login />} />

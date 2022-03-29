@@ -37,3 +37,7 @@
 .MuiCardHeader-action {
   align-self: center !important;
 }
+
+.MuiMasonry-root {
+  margin: auto !important;
+}

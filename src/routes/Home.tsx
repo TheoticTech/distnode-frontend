@@ -19,7 +19,7 @@ import { REACT_APP_API_URL } from '../config'
 function Home() {
   const navigate = useNavigate()
   const [posts, setPosts] = React.useState([])
-  const [userID, setUserID] = React.useState('')
+  const [activeUserID, setActiveUserID] = React.useState('')
   const [errorMessage, setErrorMessage] = React.useState('')
 
   React.useEffect(() => {
@@ -44,26 +44,26 @@ function Home() {
       }
     }
 
-    const getUserID = async () => {
+    const getActiveUserID = async () => {
       try {
         return await apiHandler(async () => {
           const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
             withCredentials: true
           })
-          setUserID(data.userID)
+          setActiveUserID(data.userID)
         })
       } catch (err: any) {
-        console.log('User not logged in. Viewing in guest mode.')
+        console.log('Not logged in. Viewing in guest mode.')
       }
     }
 
-    getUserID()
+    getActiveUserID()
     getPosts()
   }, [])
 
   return (
     <div>
-      <Navbar />
+      <Navbar activeUserID={activeUserID} />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
           <Container
@@ -77,7 +77,7 @@ function Home() {
             }}
           >
             <CssBaseline />
-            <PostFeed posts={posts} userID={userID} />
+            <PostFeed posts={posts} activeUserID={activeUserID} />
           </Container>
         </ThemeProvider>
       </div>
