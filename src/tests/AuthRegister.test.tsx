@@ -3,14 +3,14 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { render, act } from '@testing-library/react'
 
 // Local
-import Register from '../../routes/auth/Register'
+import AuthRegister from '../routes/AuthRegister'
 
 test('renders register page elements', () => {
   act(() => {
     render(
       <MemoryRouter initialEntries={['/auth/register']}>
         <Routes>
-          <Route path='/auth/register' element={<Register />} />
+          <Route path='/auth/register' element={<AuthRegister />} />
         </Routes>
       </MemoryRouter>
     )

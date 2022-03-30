@@ -3,14 +3,14 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { render, act } from '@testing-library/react'
 
 // Local
-import Login from '../../routes/auth/Login'
+import AuthDelete from '../routes/AuthDelete'
 
-test('renders login page elements', () => {
+test('renders delete page elements', () => {
   act(() => {
     render(
-      <MemoryRouter initialEntries={['/auth/login']}>
+      <MemoryRouter initialEntries={['/auth/delete']}>
         <Routes>
-          <Route path='/auth/login' element={<Login />} />
+          <Route path='/auth/delete' element={<AuthDelete />} />
         </Routes>
       </MemoryRouter>
     )

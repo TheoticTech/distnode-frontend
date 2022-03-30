@@ -56,7 +56,7 @@ function PostCard({
               .duration(parseInt(createdAt) - Date.now())
               .humanize(true)} by `}
             <Link
-              href={`/user/${authorUserID}`}
+              href={`/user/view/${authorUserID}`}
               underline='hover'
               variant='body1'
               style={{

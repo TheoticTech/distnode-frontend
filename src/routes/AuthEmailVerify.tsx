@@ -8,19 +8,18 @@ import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
-import '../../style/base.css'
-import baseTheme from '../../style/baseTheme'
+import '../style/base.css'
+import baseTheme from '../style/baseTheme'
 
 // Configurations
-import { REACT_APP_AUTH_URL } from '../../config'
+import { REACT_APP_AUTH_URL } from '../config'
 
-function VerifyEmail() {
-  const navigate = useNavigate()
+function AuthVerifyEmail() {
   const [errorMessage, setErrorMessage] = React.useState('')
   const [verifyEmailSuccess, setVerifyEmailSuccess] = React.useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -98,4 +97,4 @@ function VerifyEmail() {
   )
 }
 
-export default VerifyEmail
+export default AuthVerifyEmail

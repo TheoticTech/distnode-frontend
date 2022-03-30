@@ -9,48 +9,55 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
 import Link from '@mui/material/Link'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
-import '../../style/base.css'
-import baseTheme from '../../style/baseTheme'
+import '../style/base.css'
+import baseTheme from '../style/baseTheme'
 
 // Configurations
-import { REACT_APP_AUTH_URL } from '../../config'
+import { REACT_APP_AUTH_URL } from '../config'
 
-function Login() {
-  const navigate = useNavigate()
+function PasswordReset() {
   const [errorMessage, setErrorMessage] = React.useState('')
-  const { state }: any = useLocation()
+  const [passwordResetSuccess, setPasswordResetSuccess] = React.useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const login = async (loginFormData: React.FormEvent<HTMLFormElement>) => {
-    loginFormData.preventDefault()
-    const data = new FormData(loginFormData.currentTarget)
+  const passwordReset = async (
+    passwordResetFormData: React.FormEvent<HTMLFormElement>
+  ) => {
+    passwordResetFormData.preventDefault()
+    const data = new FormData(passwordResetFormData.currentTarget)
 
     try {
-      const loginRes = await axios.post(
-        `${REACT_APP_AUTH_URL}/auth/login`,
+      if (data.get('password') !== data.get('passwordConfirmation')) {
+        throw new Error('Passwords do not match')
+      }
+      await axios.post(
+        `${REACT_APP_AUTH_URL}/auth/password-reset?token=${searchParams.get(
+          'token'
+        )}`,
         {
-          email: data.get('email')?.toString().toLowerCase(),
           password: data.get('password')
         },
         { withCredentials: true }
       )
-
-      if (state?.next) {
-        navigate(state.next)
-      } else {
-        navigate(`/user/${loginRes.data.userID}`)
-      }
+      setErrorMessage('')
+      setPasswordResetSuccess(true)
     } catch (err: any) {
-      const loginError = err.response?.data?.loginError
-      if (loginError) {
-        setErrorMessage(loginError)
+      const passwordResetError = err.response?.data?.passwordResetError
+      if (passwordResetError) {
+        setErrorMessage(passwordResetError)
+        setPasswordResetSuccess(false)
+      } else if (err.message === 'Passwords do not match') {
+        setErrorMessage(err.message)
+        setPasswordResetSuccess(false)
       } else {
         setErrorMessage('An unknown error occurred, please try again later')
+        setPasswordResetSuccess(false)
       }
     }
   }
@@ -72,11 +79,11 @@ function Login() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
-              Login
+              Reset Password
             </Typography>
             <Box
               component='form'
-              onSubmit={login}
+              onSubmit={passwordReset}
               noValidate
               sx={{ input: { color: 'white' } }}
             >
@@ -86,11 +93,11 @@ function Login() {
                     margin='normal'
                     required
                     fullWidth
-                    id='email'
-                    label='Email Address'
-                    name='email'
-                    autoComplete='email'
-                    autoFocus
+                    name='password'
+                    label='New Password'
+                    type='password'
+                    id='password'
+                    autoComplete='current-password'
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -98,10 +105,10 @@ function Login() {
                     margin='normal'
                     required
                     fullWidth
-                    name='password'
-                    label='Password'
+                    name='passwordConfirmation'
+                    label='Confirm Password'
                     type='password'
-                    id='password'
+                    id='password-confirmation'
                     autoComplete='current-password'
                   />
                 </Grid>
@@ -109,6 +116,11 @@ function Login() {
                   {errorMessage && (
                     <Typography variant='body2' color='error'>
                       Error: {errorMessage}
+                    </Typography>
+                  )}
+                  {passwordResetSuccess && (
+                    <Typography variant='body2'>
+                      Password reset successful!
                     </Typography>
                   )}
                 </Grid>
@@ -119,17 +131,12 @@ function Login() {
                     variant='contained'
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Login
+                    Reset Password
                   </Button>
                 </Grid>
-                <Grid item xs={6}>
-                  <Link href='/auth/password-reset-request' variant='body2'>
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item xs={6}>
-                  <Link href='/auth/register' variant='body2'>
-                    Don&apos;t have an account?
+                <Grid item xs={12}>
+                  <Link href='/' variant='body2'>
+                    Home
                   </Link>
                 </Grid>
               </Grid>
@@ -141,4 +148,4 @@ function Login() {
   )
 }
 
-export default Login
+export default PasswordReset

@@ -19,7 +19,7 @@ function PostFeed({ activeUserID, posts }: any) {
           title={post.title}
           createdAt={post.postCreatedAt}
           description={post.description}
-          linkHref={`/post/${post.postID}`}
+          linkHref={`/post/view/${post.postID}`}
         />
       ))}
     </Masonry>

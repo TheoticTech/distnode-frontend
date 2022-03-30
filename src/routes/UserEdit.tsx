@@ -24,7 +24,7 @@ import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
 // Constants
 const DEFAULT_AVATAR_URL = `${REACT_APP_STATIC_URL}/resources/default-avatar.png`
 
-const AddPost = () => {
+const UserEdit = () => {
   const navigate = useNavigate()
   const [activeUserID, setActiveUserID] = React.useState('')
   const [errorMessage, setErrorMessage] = React.useState('')
@@ -104,7 +104,7 @@ const AddPost = () => {
 
     try {
       return await apiHandler(async () => {
-        const result = await axios.post(
+        await axios.post(
           `${REACT_APP_API_URL}/api/user/${userID}/profile/edit`,
           {
             ...(data.get('bio') && { bio: data.get('bio') }),
@@ -113,15 +113,15 @@ const AddPost = () => {
           },
           { withCredentials: true }
         )
-        navigate(`/user/${userID}`)
+        navigate(`/user/view/${userID}`)
       })
     } catch (err: any) {
       if (err instanceof AuthError) {
         navigate('/auth/login')
       } else {
-        const addPostError = err.response?.data?.addPostError
-        if (addPostError) {
-          setErrorMessage(addPostError)
+        const editProfileError = err.response?.data?.editProfileError
+        if (editProfileError) {
+          setErrorMessage(editProfileError)
         } else if (err.message) {
           setErrorMessage(err.message)
         } else {
@@ -224,4 +224,4 @@ const AddPost = () => {
   )
 }
 
-export default AddPost
+export default UserEdit

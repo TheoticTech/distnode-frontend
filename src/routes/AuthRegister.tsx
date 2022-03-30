@@ -14,11 +14,11 @@ import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
-import '../../style/base.css'
-import baseTheme from '../../style/baseTheme'
+import '../style/base.css'
+import baseTheme from '../style/baseTheme'
 
 // Configurations
-import { REACT_APP_AUTH_URL } from '../../config'
+import { REACT_APP_AUTH_URL } from '../config'
 
 function Register() {
   const [errorMessage, setErrorMessage] = React.useState('')

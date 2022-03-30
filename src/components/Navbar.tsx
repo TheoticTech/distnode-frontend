@@ -85,7 +85,7 @@ const Navbar = ({ activeUserID }: any) => {
     setMobileMoreAnchorEl(event.currentTarget)
   }
 
-  const mobileMenuId = 'primary-search-account-menu-mobile'
+  const mobileMenuId = 'mobile-menu'
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
@@ -109,11 +109,13 @@ const Navbar = ({ activeUserID }: any) => {
         </StyledMenuItemLink>
       </MenuItem>
       <MenuItem>
-        <StyledMenuItemLink href='/posts/add'>
+        <StyledMenuItemLink href='/post/add'>
           <AddIcon />
           <span style={{ paddingLeft: '4em' }}>Create Post</span>
         </StyledMenuItemLink>
       </MenuItem>
+      {/*
+      // Messages not implemented yet
       <MenuItem>
         <StyledMenuItemLink href='/user/messages'>
           <Badge badgeContent={4} color='error'>
@@ -122,6 +124,9 @@ const Navbar = ({ activeUserID }: any) => {
           <span style={{ paddingLeft: '4em' }}>Messages</span>
         </StyledMenuItemLink>
       </MenuItem>
+      */}
+      {/*
+      // Notifications not implemented yet
       <MenuItem>
         <StyledMenuItemLink href='/user/notifications'>
           <Badge badgeContent={7} color='error'>
@@ -130,11 +135,19 @@ const Navbar = ({ activeUserID }: any) => {
           <span style={{ paddingLeft: '4em' }}>Notifications</span>
         </StyledMenuItemLink>
       </MenuItem>
+      */}
       <MenuItem>
-        <StyledMenuItemLink href='/user/profile'>
-          <AccountCircle />
-          <span style={{ paddingLeft: '4em' }}>Profile</span>
-        </StyledMenuItemLink>
+        {activeUserID ? (
+          <StyledMenuItemLink href={`/user/view/${activeUserID}`}>
+            <AccountCircle />
+            <span style={{ paddingLeft: '4em' }}>Profile</span>
+          </StyledMenuItemLink>
+        ) : (
+          <StyledMenuItemLink href='/auth/login'>
+            <AccountCircle />
+            <span style={{ paddingLeft: '4em' }}>Login</span>
+          </StyledMenuItemLink>
+        )}
       </MenuItem>
     </Menu>
   )
@@ -148,7 +161,7 @@ const Navbar = ({ activeUserID }: any) => {
               variant='h6'
               noWrap
               component='div'
-              sx={{ display: { xs: 'none', sm: 'block' } }}
+              sx={{ display: 'block' }}
             >
               <StyledMenuItemLink href='/'>{REACT_APP_NAME}</StyledMenuItemLink>
             </Typography>
@@ -169,7 +182,7 @@ const Navbar = ({ activeUserID }: any) => {
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
               <IconButton size='large' aria-label='create new' color='inherit'>
-                <StyledMenuItemLink href='/posts/add'>
+                <StyledMenuItemLink href='/post/add'>
                   <AddIcon />
                 </StyledMenuItemLink>
               </IconButton>
@@ -206,7 +219,7 @@ const Navbar = ({ activeUserID }: any) => {
                 color='inherit'
               >
                 {activeUserID ? (
-                  <StyledMenuItemLink href={`/user/${activeUserID}`}>
+                  <StyledMenuItemLink href={`/user/view/${activeUserID}`}>
                     <AccountCircle />
                   </StyledMenuItemLink>
                 ) : (

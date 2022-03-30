@@ -8,7 +8,6 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
-import Link from '@mui/material/Link'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import moment from 'moment'
@@ -19,7 +18,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 
 // Local
-import { AuthError, apiHandler } from '../utils/apiHandler'
+import { apiHandler } from '../utils/apiHandler'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
 import PostFeed from '../components/PostFeed'
@@ -32,7 +31,7 @@ import {
   REACT_APP_STATIC_URL
 } from '../config'
 
-function Profile() {
+function UserView() {
   const navigate = useNavigate()
   const [activeUserID, setActiveUserID] = React.useState('')
   const [userInfo, setUserInfo] = React.useState({
@@ -104,7 +103,11 @@ function Profile() {
       <Navbar activeUserID={activeUserID} />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
-          <Container component='main' sx={{ justifyContent: 'center' }}>
+          <Container
+            component='main'
+            maxWidth={false}
+            sx={{ justifyContent: 'center' }}
+          >
             <CssBaseline />
             {errorMessage && (
               <Typography variant='h6' color='error'>
@@ -149,7 +152,7 @@ function Profile() {
                         <MenuItem
                           onClick={() => {
                             handleProfileMenuClose()
-                            navigate(`/user/${activeUserID}/edit`)
+                            navigate(`/user/edit/${activeUserID}`)
                           }}
                         >
                           Edit Profile
@@ -171,7 +174,7 @@ function Profile() {
                         <MenuItem
                           onClick={() => {
                             handleProfileMenuClose()
-                            navigate('/auth/delete-user')
+                            navigate('/auth/delete')
                           }}
                           sx={{ color: 'red' }}
                         >
@@ -202,7 +205,7 @@ function Profile() {
                           variant='contained'
                           component='span'
                           onClick={() => {
-                            navigate(`/user/${activeUserID}/edit`)
+                            navigate(`/user/edit/${activeUserID}`)
                           }}
                         >
                           Select Profile Picture
@@ -242,7 +245,7 @@ function Profile() {
                             variant='contained'
                             component='span'
                             onClick={() => {
-                              navigate(`/user/${activeUserID}/edit`)
+                              navigate(`/user/edit/${activeUserID}`)
                             }}
                           >
                             Add Bio
@@ -262,4 +265,4 @@ function Profile() {
   )
 }
 
-export default Profile
+export default UserView

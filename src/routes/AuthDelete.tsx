@@ -5,6 +5,7 @@ import axios from 'axios'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
+import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
@@ -14,40 +15,53 @@ import TextField from '@mui/material/TextField'
 import { ThemeProvider } from '@mui/material/styles'
 
 // Local
-import '../../style/base.css'
-import baseTheme from '../../style/baseTheme'
+import '../style/base.css'
+import baseTheme from '../style/baseTheme'
 
 // Configurations
-import { REACT_APP_AUTH_URL } from '../../config'
+import { REACT_APP_AUTH_URL } from '../config'
 
-function PasswordResetRequest() {
-  const [passwordResetSuccess, setPasswordResetSuccess] = React.useState(false)
+function AuthDelete() {
+  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
 
-  const submitPasswordResetRequest = async (
-    forgotPasswordFormData: React.FormEvent<HTMLFormElement>
+  const confirmDelete = async (
+    deleteFormData: React.FormEvent<HTMLFormElement>
   ) => {
-    forgotPasswordFormData.preventDefault()
-    const data = new FormData(forgotPasswordFormData.currentTarget)
-    console.log(
-      "data.get('email')?.toString().toLowerCase():",
-      data.get('email')?.toString().toLowerCase()
-    )
-    try {
-      await axios.get(
-        `${REACT_APP_AUTH_URL}/auth/password-reset?email=${data
-          .get('email')
-          ?.toString()
-          .toLowerCase()}`
-      )
-      setErrorMessage('')
-      setPasswordResetSuccess(true)
-    } catch (err: any) {
-      const passwordResetError = err.response?.data?.passwordResetError
-      if (passwordResetError) {
-        setErrorMessage(passwordResetError)
-      } else {
-        setErrorMessage('An unknown error occurred, please try again later')
+    deleteFormData.preventDefault()
+    const data = new FormData(deleteFormData.currentTarget)
+
+    if (window.confirm('Are you sure you want to delete your account?')) {
+      try {
+        // First, ensure user has fresh CSRF token
+        await axios.post(
+          `${REACT_APP_AUTH_URL}/auth/login`,
+          {
+            email: data.get('email')?.toString().toLowerCase(),
+            password: data.get('password')
+          },
+          { withCredentials: true }
+        )
+        // Then, delete user account
+        await axios.delete(`${REACT_APP_AUTH_URL}/auth/user`, {
+          data: {
+            email: data.get('email')?.toString().toLowerCase(),
+            password: data.get('password'),
+            csrfToken: Cookies.get('csrfToken')
+          },
+          withCredentials: true
+        })
+        navigate('/')
+      } catch (err: any) {
+        const loginError = err.response?.data?.loginError
+        const deleteUserError = err.response?.data?.deleteUserError
+        if (loginError) {
+          setErrorMessage(loginError)
+        } else if (deleteUserError) {
+          setErrorMessage(deleteUserError)
+        } else {
+          setErrorMessage('An unknown error occurred, please try again later')
+        }
       }
     }
   }
@@ -69,11 +83,11 @@ function PasswordResetRequest() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
-              Reset Password
+              Delete Account
             </Typography>
             <Box
               component='form'
-              onSubmit={submitPasswordResetRequest}
+              onSubmit={confirmDelete}
               noValidate
               sx={{ input: { color: 'white' } }}
             >
@@ -91,16 +105,21 @@ function PasswordResetRequest() {
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    name='password'
+                    label='Password'
+                    type='password'
+                    id='password'
+                    autoComplete='current-password'
+                  />
+                </Grid>
+                <Grid item xs={12}>
                   {errorMessage && (
                     <Typography variant='body2' color='error'>
                       Error: {errorMessage}
-                    </Typography>
-                  )}
-                </Grid>
-                <Grid item xs={12}>
-                  {passwordResetSuccess && (
-                    <Typography variant='body2'>
-                      Password reset email sent!
                     </Typography>
                   )}
                 </Grid>
@@ -111,7 +130,7 @@ function PasswordResetRequest() {
                     variant='contained'
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Reset Password
+                    Delete Account
                   </Button>
                 </Grid>
               </Grid>
@@ -123,4 +142,4 @@ function PasswordResetRequest() {
   )
 }
 
-export default PasswordResetRequest
+export default AuthDelete

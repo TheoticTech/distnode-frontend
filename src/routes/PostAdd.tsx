@@ -25,7 +25,7 @@ import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
 // TinyMCE scope
 declare const tinymce: any
 
-const AddPost = () => {
+const PostAdd = () => {
   const navigate = useNavigate()
   const [activeUserID, setActiveUserID] = React.useState('')
   const [errorMessage, setErrorMessage] = React.useState('')
@@ -42,13 +42,13 @@ const AddPost = () => {
         })
       } catch (err: any) {
         console.log('Not logged in. Requesting login now.')
-        navigate('/auth/login', { state: { next: '/posts/add' } })
+        navigate('/auth/login', { state: { next: '/post/add' } })
       }
     }
     getActiveUserID()
   }, [])
 
-  const addPost = async (postData: React.FormEvent<HTMLFormElement>) => {
+  const postAdd = async (postData: React.FormEvent<HTMLFormElement>) => {
     postData.preventDefault()
     const data = new FormData(postData.currentTarget)
 
@@ -58,7 +58,7 @@ const AddPost = () => {
         setErrorMessage('Post body must not be empty')
       } else {
         return await apiHandler(async () => {
-          const result = await axios.post(
+          await axios.post(
             `${REACT_APP_API_URL}/api/posts/add`,
             {
               title: data.get('title'),
@@ -107,7 +107,7 @@ const AddPost = () => {
               </Typography>
               <Box
                 component='form'
-                onSubmit={addPost}
+                onSubmit={postAdd}
                 noValidate
                 sx={{ input: { color: 'white' } }}
               >
@@ -258,4 +258,4 @@ const AddPost = () => {
   )
 }
 
-export default AddPost
+export default PostAdd

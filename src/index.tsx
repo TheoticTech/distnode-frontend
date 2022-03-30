@@ -5,34 +5,38 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 // Local
 import './style/index.css'
-import AddPost from './routes/AddPost'
+import AuthDelete from './routes/AuthDelete'
+import AuthEmailVerify from './routes/AuthEmailVerify'
+import AuthLogin from './routes/AuthLogin'
+import AuthPasswordReset from './routes/AuthPasswordReset'
+import AuthPasswordResetRequest from './routes/AuthPasswordResetRequest'
+import AuthRegister from './routes/AuthRegister'
 import Home from './routes/Home'
-import Delete from './routes/auth/Delete'
-import Login from './routes/auth/Login'
-import PasswordResetRequest from './routes/auth/PasswordResetRequest'
-import Register from './routes/auth/Register'
-import Profile from './routes/Profile'
-import ProfileEdit from './routes/ProfileEdit'
-import VerifyEmail from './routes/auth/VerifyEmail'
-import PasswordReset from './routes/auth/PasswordReset'
+import PostAdd from './routes/PostAdd'
+// import PostEdit from './routes/PostEdit'
+// import PostView from './routes/PostView'
+import UserEdit from './routes/UserEdit'
+import UserView from './routes/UserView'
 
 render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/user/:userID' element={<Profile />} />
-        <Route path='/user/:userID/edit' element={<ProfileEdit />} />
-        <Route path='/posts/add' element={<AddPost />} />
-        <Route path='/auth/delete-user' element={<Delete />} />
-        <Route path='/auth/login' element={<Login />} />
-        <Route path='/auth/register' element={<Register />} />
+        <Route path='/user/view/:userID' element={<UserView />} />
+        <Route path='/user/edit/:userID' element={<UserEdit />} />
+        <Route path='/post/add' element={<PostAdd />} />
+        {/* <Route path='/post/edit/:postID' element={<PostEdit />} /> */}
+        {/* <Route path='/post/view/:postID' element={<PostView />} /> */}
+        <Route path='/auth/delete' element={<AuthDelete />} />
+        <Route path='/auth/login' element={<AuthLogin />} />
+        <Route path='/auth/register' element={<AuthRegister />} />
         <Route
-          path='/auth/password-reset-request'
-          element={<PasswordResetRequest />}
+          path='/auth/password/reset/request'
+          element={<AuthPasswordResetRequest />}
         />
-        <Route path='/auth/password-reset' element={<PasswordReset />} />
-        <Route path='/auth/verify-email' element={<VerifyEmail />} />
+        <Route path='/auth/password/reset' element={<AuthPasswordReset />} />
+        <Route path='/auth/email/verify' element={<AuthEmailVerify />} />
         <Route path='/health' element={'{"status":"ok"}'} />
         <Route path='*' element={'Route not found'} />
       </Routes>

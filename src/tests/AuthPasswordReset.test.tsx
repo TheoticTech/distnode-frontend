@@ -3,14 +3,14 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { render, act } from '@testing-library/react'
 
 // Local
-import PasswordReset from '../../routes/auth/PasswordReset'
+import AuthPasswordReset from '../routes/AuthPasswordReset'
 
 test('renders password reset page elements', () => {
   act(() => {
     render(
-      <MemoryRouter initialEntries={['/auth/password-reset']}>
+      <MemoryRouter initialEntries={['/auth/password/reset']}>
         <Routes>
-          <Route path='/auth/password-reset' element={<PasswordReset />} />
+          <Route path='/auth/password/reset' element={<AuthPasswordReset />} />
         </Routes>
       </MemoryRouter>
     )
