@@ -7,30 +7,35 @@ import Container from '@mui/material/Container'
 import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
-import { useNavigate, useParams } from 'react-router-dom'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { ThemeProvider } from '@mui/material/styles'
+import { useNavigate, useParams } from 'react-router-dom'
 
 // Local
 import { AuthError, apiHandler } from '../utils/apiHandler'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
+import TinyEditor from '../components/tinyEditor'
 import '../style/base.css'
 
 // Configurations
-import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
+import { REACT_APP_API_URL } from '../config'
 
-// Constants
-const DEFAULT_AVATAR_URL = `${REACT_APP_STATIC_URL}/resources/default-avatar.png`
-
-const UserEdit = () => {
+const PostEdit = () => {
   const navigate = useNavigate()
   const [activeUserID, setActiveUserID] = React.useState('')
+  const [post, setPost] = React.useState({
+    postID: '',
+    createdAt: Date.now(),
+    description: '',
+    title: '',
+    body: '',
+    thumbnail: null
+  })
   const [errorMessage, setErrorMessage] = React.useState('')
-  const [bio, setBio] = React.useState('')
-  const [avatar, setAvatar] = React.useState(DEFAULT_AVATAR_URL)
-  const { userID } = useParams() // userID from URL
+  const { postID } = useParams() // postID from URL
+  const editorRef = React.useRef<any>(null)
 
   React.useEffect(() => {
     const getActiveUserID = async () => {
@@ -40,31 +45,26 @@ const UserEdit = () => {
             withCredentials: true
           })
           setActiveUserID(data.userID)
-          if (data.userID !== userID) {
-            navigate(-1)
-          }
         })
       } catch (err: any) {
         console.log('Not logged in. Requesting login now.')
-        navigate('/auth/login')
+        navigate('/auth/login', { state: { next: `/post/edit/${postID}` } })
       }
     }
 
-    const getUserData = async () => {
+    const getPostData = async () => {
       try {
         return await apiHandler(async () => {
           const { data } = await axios.get(
-            `${REACT_APP_API_URL}/api/user/${userID}/profile`,
+            `${REACT_APP_API_URL}/api/post/${postID}/`,
             {}
           )
-          const { bio, avatar } = data.user
-          setBio(bio)
-          setAvatar(avatar)
+          setPost(data.post)
         })
       } catch (err: any) {
-        const getUserProfileError = err.response?.data?.getUserProfileError
-        if (getUserProfileError && err.response?.status === 404) {
-          setErrorMessage('User not found.')
+        const getPostError = err.response?.data?.getPostError
+        if (getPostError && err.response?.status === 404) {
+          setErrorMessage('Post not found.')
         } else {
           if (err.message) {
             setErrorMessage(err.message)
@@ -76,7 +76,7 @@ const UserEdit = () => {
     }
 
     getActiveUserID()
-    getUserData()
+    getPostData()
   }, [])
 
   const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,37 +91,39 @@ const UserEdit = () => {
           data: fd,
           withCredentials: true
         })
-        setAvatar(response.data.file.location)
+        setPost({ ...post, thumbnail: response.data.file.location })
       })
     }
   }
 
-  const editProfile = async (
-    editProfileData: React.FormEvent<HTMLFormElement>
-  ) => {
-    editProfileData.preventDefault()
-    const data = new FormData(editProfileData.currentTarget)
+  const editPost = async (postData: React.FormEvent<HTMLFormElement>) => {
+    postData.preventDefault()
 
     try {
-      return await apiHandler(async () => {
-        await axios.post(
-          `${REACT_APP_API_URL}/api/user/${userID}/profile/edit`,
-          {
-            ...(data.get('bio') && { bio: data.get('bio') }),
-            ...(avatar !== DEFAULT_AVATAR_URL && { avatar }),
-            csrfToken: Cookies.get('csrfToken')
-          },
-          { withCredentials: true }
-        )
-        navigate(`/user/view/${userID}`)
-      })
+      const content = editorRef.current.getContent()
+      if (!content) {
+        setErrorMessage('Post body must not be empty')
+      } else {
+        return await apiHandler(async () => {
+          await axios.post(
+            `${REACT_APP_API_URL}/api/posts/edit/${postID}`,
+            {
+              ...post,
+              body: editorRef.current.getContent(),
+              csrfToken: Cookies.get('csrfToken')
+            },
+            { withCredentials: true }
+          )
+          navigate('/')
+        })
+      }
     } catch (err: any) {
       if (err instanceof AuthError) {
         navigate('/auth/login')
       } else {
-        const editProfileError = err.response?.data?.editProfileError
-        if (editProfileError) {
-          setErrorMessage(editProfileError)
+        const editPostError = err.response?.data?.editPostError
+        if (editPostError) {
+          setErrorMessage(editPostError)
         } else if (err.message) {
           setErrorMessage(err.message)
         } else {
@@ -136,7 +138,7 @@ const UserEdit = () => {
       <Navbar activeUserID={activeUserID} />
       <div className='App'>
         <ThemeProvider theme={baseTheme}>
-          <Container component='main' maxWidth='xs'>
+          <Container component='main' maxWidth={'xl'}>
             <CssBaseline />
             <Box
               sx={{
@@ -147,29 +149,29 @@ const UserEdit = () => {
               }}
             >
               <Typography component='h1' variant='h5'>
-                Edit profile
+                Edit post
               </Typography>
               <Box
                 component='form'
-                onSubmit={editProfile}
+                onSubmit={editPost}
                 noValidate
-                sx={{ mt: 2, input: { color: 'white' } }}
+                sx={{ mt: 7, input: { color: 'white' } }}
               >
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <img
-                      src={avatar}
-                      style={{
-                        width: '70%',
-                        borderRadius: '100%',
-                        border: '1px solid white'
-                      }}
-                    />
-                    <label htmlFor='uploadAvatar'>
+                    {post.thumbnail && (
+                      <Grid item xs={12}>
+                        <img
+                          src={post.thumbnail}
+                          style={{ objectFit: 'contain' }}
+                        />
+                      </Grid>
+                    )}
+                    <label htmlFor='uploadThumbnail'>
                       <input
                         style={{ display: 'none' }}
-                        id='uploadAvatar'
-                        name='uploadAvatar'
+                        id='uploadThumbnail'
+                        name='uploadThumbnail'
                         type='file'
                         onChange={onImageChange}
                       />
@@ -178,26 +180,45 @@ const UserEdit = () => {
                         variant='contained'
                         component='span'
                       >
-                        Select New Profile Picture
+                        Select Thumbnail Picture
                       </Button>
                     </label>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      margin='normal'
+                      required
+                      fullWidth
+                      id='title'
+                      label='Title'
+                      name='title'
+                      value={post.title}
+                      onChange={(e) =>
+                        setPost({ ...post, title: e.target.value })
+                      }
+                      autoFocus
+                    />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       inputProps={{ style: { color: 'white' } }}
                       margin='normal'
                       multiline
-                      minRows={4}
-                      maxRows={7}
+                      minRows={3}
+                      maxRows={4}
                       required
                       fullWidth
-                      id='bio'
-                      label='Bio'
-                      name='bio'
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      autoFocus
+                      id='description'
+                      label='Description'
+                      name='description'
+                      value={post.description}
+                      onChange={(e) =>
+                        setPost({ ...post, description: e.target.value })
+                      }
                     />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TinyEditor innerRef={editorRef} initialValue={post.body} />
                   </Grid>
                   <Grid item xs={12}>
                     <Button
@@ -224,4 +245,4 @@ const UserEdit = () => {
   )
 }
 
-export default UserEdit
+export default PostEdit

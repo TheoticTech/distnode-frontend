@@ -4,6 +4,7 @@ import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import React from 'react'
 import { ThemeProvider } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
 import { useNavigate } from 'react-router-dom'
 
 // Local
@@ -68,7 +69,7 @@ function Home() {
         <ThemeProvider theme={baseTheme}>
           <Container
             component='main'
-            maxWidth={false}
+            maxWidth={'xl'}
             sx={{
               my: 7,
               display: 'flex',
@@ -77,6 +78,11 @@ function Home() {
             }}
           >
             <CssBaseline />
+            {errorMessage && (
+              <Typography variant='h6' color='error'>
+                {errorMessage}
+              </Typography>
+            )}
             <PostFeed posts={posts} activeUserID={activeUserID} />
           </Container>
         </ThemeProvider>

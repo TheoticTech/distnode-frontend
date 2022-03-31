@@ -31,7 +31,7 @@ import {
   REACT_APP_STATIC_URL
 } from '../config'
 
-function UserView() {
+function ProfileView() {
   const navigate = useNavigate()
   const [activeUserID, setActiveUserID] = React.useState('')
   const [userInfo, setUserInfo] = React.useState({
@@ -105,7 +105,7 @@ function UserView() {
         <ThemeProvider theme={baseTheme}>
           <Container
             component='main'
-            maxWidth={false}
+            maxWidth={'xl'}
             sx={{ justifyContent: 'center' }}
           >
             <CssBaseline />
@@ -115,7 +115,7 @@ function UserView() {
               </Typography>
             )}
             {!errorMessage && (
-              <div>
+              <Grid>
                 <Card sx={{ m: 2, position: 'relative' }}>
                   {activeUserID === userID && (
                     <div>
@@ -256,7 +256,7 @@ function UserView() {
                   </Grid>
                 </Card>
                 <PostFeed posts={posts} activeUserID={activeUserID} />
-              </div>
+              </Grid>
             )}
           </Container>
         </ThemeProvider>
@@ -265,4 +265,4 @@ function UserView() {
   )
 }
 
-export default UserView
+export default ProfileView

@@ -3,14 +3,17 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { render, screen, act } from '@testing-library/react'
 
 // Local
-import AuthEmailVerify from '../routes/AuthEmailVerify'
+import AuthEmailVerification from '../routes/AuthEmailVerification'
 
 test('renders email verify page elements', () => {
   act(() => {
     render(
-      <MemoryRouter initialEntries={['/auth/email/verify']}>
+      <MemoryRouter initialEntries={['/auth/email/verification']}>
         <Routes>
-          <Route path='/auth/email/verify' element={<AuthEmailVerify />} />
+          <Route
+            path='/auth/email/verification'
+            element={<AuthEmailVerification />}
+          />
         </Routes>
       </MemoryRouter>
     )

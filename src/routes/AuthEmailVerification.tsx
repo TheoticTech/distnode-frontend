@@ -19,16 +19,16 @@ import baseTheme from '../style/baseTheme'
 // Configurations
 import { REACT_APP_AUTH_URL } from '../config'
 
-function AuthVerifyEmail() {
+function AuthEmailVerification() {
   const [errorMessage, setErrorMessage] = React.useState('')
   const [verifyEmailSuccess, setVerifyEmailSuccess] = React.useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
 
   React.useEffect(() => {
-    verifyEmail()
+    emailVerification()
   }, [])
 
-  const verifyEmail = async () => {
+  const emailVerification = async () => {
     try {
       await axios.post(
         `${REACT_APP_AUTH_URL}/auth/verify-email?token=${searchParams.get(
@@ -97,4 +97,4 @@ function AuthVerifyEmail() {
   )
 }
 
-export default AuthVerifyEmail
+export default AuthEmailVerification

@@ -11,9 +11,11 @@ RUN npm ci
 # Bundle app source
 COPY . .
 
-# Configure API and AUTH URL endpoints
+# Configure REACT_APP environment variables
+ARG REACT_APP_NAME=DistNode
 ARG REACT_APP_API_URL=https://dev-api.distnode.com
 ARG REACT_APP_AUTH_URL=https://dev-auth.distnode.com
+ARG REACT_APP_STATIC_URL=https://distnode-static-dev.sfo3.digitaloceanspaces.com
 
 # Generate build artifacts
 RUN npm run build

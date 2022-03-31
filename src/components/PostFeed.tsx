@@ -7,7 +7,7 @@ import PostCard from './PostCard'
 
 function PostFeed({ activeUserID, posts }: any) {
   return (
-    <Masonry columns={{ xs: 1, sm: 1, md: 2, lg: 3, xl: 5 }} spacing={4}>
+    <Masonry columns={{ xs: 1, sm: 1, md: 2, lg: 3 }} spacing={4}>
       {posts.map((post: any) => (
         <PostCard
           key={post.postID}
@@ -15,11 +15,11 @@ function PostFeed({ activeUserID, posts }: any) {
           authorUserID={post.userID}
           authorUsername={post.username}
           avatarSrc={post.avatar}
-          headerImageSrc='https://distnode-static-dev.sfo3.digitaloceanspaces.com/uploads/paella.jpg'
+          headerImageSrc={post.thumbnail}
+          postID={post.postID}
           title={post.title}
           createdAt={post.postCreatedAt}
           description={post.description}
-          linkHref={`/post/view/${post.postID}`}
         />
       ))}
     </Masonry>
