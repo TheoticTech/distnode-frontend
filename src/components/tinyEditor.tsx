@@ -9,9 +9,6 @@ import { apiHandler } from '../utils/apiHandler'
 // Configurations
 import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
 
-// TinyMCE scope
-declare const tinymce: any
-
 const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
   return (
     <Editor
@@ -24,31 +21,17 @@ const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
         skin: 'oxide-dark',
         content_css: 'dark',
         menubar: false,
-        plugins: [
-          'advlist',
-          'anchor',
-          'autolink',
-          'charmap',
-          'fullscreen',
-          'image',
-          'insertdatetime',
-          'lists',
-          'media',
-          'preview',
-          'searchreplace',
-          'table',
-          'visualblocks',
-          'wordcount'
-        ],
+        plugins: ['image', 'lists', 'media'],
         toolbar:
-          'undo redo | formatselect | ' +
-          'bold italic strikethrough underline | backcolor | ' +
+          'bold italic strikethrough underline | ' +
           'alignleft aligncenter alignright alignjustify | bullist numlist | ' +
           'outdent indent | image media',
         content_style:
           'body { font-family:Roboto,Helvetica,Arial,sans-serif; font-size:14px }',
         media_dimensions: false,
-        // paste_as_text: true, // uncomment to disable formatting on paste
+        mobile: {
+          toolbar_mode: 'floating'
+        },
         audio_template_callback: function (data: any) {
           return (
             '<p style="text-align: center"><audio controls src="' +
