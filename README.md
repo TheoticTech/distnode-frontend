@@ -28,7 +28,6 @@ docker build -t frontend:latest .
 
 ## Using Available Build Arguments
 ```sh
-docker build -t frontend:latest .
 docker build \
     --build-arg REACT_APP_NAME=DistNode \
     --build-arg REACT_APP_API_URL=https://dev-api.distnode.com \

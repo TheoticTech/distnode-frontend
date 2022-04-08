@@ -47,6 +47,7 @@ const PostEdit = () => {
           setActiveUserID(data.userID)
         })
       } catch (err: any) {
+        console.error('I WAS CALLED!', err)
         console.log('Not logged in. Requesting login now.')
         navigate('/auth/login', { state: { next: `/post/edit/${postID}` } })
       }
@@ -161,10 +162,7 @@ const PostEdit = () => {
                   <Grid item xs={12}>
                     {post.thumbnail && (
                       <Grid item xs={12}>
-                        <img
-                          src={post.thumbnail}
-                          style={{ objectFit: 'contain' }}
-                        />
+                        <img src={post.thumbnail} style={{ maxWidth: '97%' }} />
                       </Grid>
                     )}
                     <label htmlFor='uploadThumbnail'>
@@ -179,6 +177,7 @@ const PostEdit = () => {
                         color='secondary'
                         variant='contained'
                         component='span'
+                        sx={{ mt: 2 }}
                       >
                         Select Thumbnail Picture
                       </Button>

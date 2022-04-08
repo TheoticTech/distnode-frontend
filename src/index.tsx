@@ -18,6 +18,8 @@ import PostView from './routes/PostView'
 import ProfileEdit from './routes/ProfileEdit'
 import ProfileView from './routes/ProfileView'
 
+const helmetContext = {}
+
 render(
   <React.StrictMode>
     <BrowserRouter>
@@ -27,7 +29,10 @@ render(
         <Route path='/user/edit/:userID' element={<ProfileEdit />} />
         <Route path='/post/add' element={<PostAdd />} />
         <Route path='/post/edit/:postID' element={<PostEdit />} />
-        <Route path='/post/view/:postID' element={<PostView />} />
+        <Route
+          path='/post/view/:postID'
+          element={<PostView helmetContext={helmetContext} />}
+        />
         <Route path='/auth/delete' element={<AuthDelete />} />
         <Route path='/auth/login' element={<AuthLogin />} />
         <Route path='/auth/register' element={<AuthRegister />} />

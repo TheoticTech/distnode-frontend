@@ -8,7 +8,7 @@ import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import { Helmet } from 'react-helmet'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
 import IconButton from '@mui/material/IconButton'
 import Link from '@mui/material/Link'
 import Menu from '@mui/material/Menu'
@@ -35,7 +35,7 @@ import {
   REACT_APP_STATIC_URL
 } from '../config'
 
-function PostView() {
+function PostView({ helmetContext }: any) {
   const navigate = useNavigate()
   const [activeUserID, setActiveUserID] = React.useState('')
   const [authorInfo, setAuthorInfo] = React.useState({
@@ -168,7 +168,7 @@ function PostView() {
   }, [])
 
   return (
-    <div>
+    <HelmetProvider context={helmetContext}>
       <Helmet>
         <title>{post.title}</title>
         <meta property='og:title' content={post.title} />
@@ -256,10 +256,7 @@ function PostView() {
                 <Grid>
                   {post.thumbnail && (
                     <Grid item xs={12} sx={{ my: 7 }}>
-                      <img
-                        src={post.thumbnail}
-                        style={{ objectFit: 'contain' }}
-                      />
+                      <img src={post.thumbnail} style={{ maxWidth: '97%' }} />
                     </Grid>
                   )}
                   <Typography
@@ -339,7 +336,7 @@ function PostView() {
           </Container>
         </ThemeProvider>
       </div>
-    </div>
+    </HelmetProvider>
   )
 }
 

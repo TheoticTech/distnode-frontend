@@ -131,7 +131,7 @@ const PostAdd = () => {
                   <Grid item xs={12}>
                     {thumbnail && (
                       <Grid item xs={12}>
-                        <img src={thumbnail} style={{ objectFit: 'contain' }} />
+                        <img src={thumbnail} style={{ maxWidth: '97%' }} />
                       </Grid>
                     )}
                     <label htmlFor='uploadThumbnail'>
