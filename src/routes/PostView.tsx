@@ -261,7 +261,12 @@ function PostView({ helmetContext }: any) {
                   )}
                   <Typography
                     variant='h2'
-                    sx={{ mt: 7, mb: 2, fontWeight: 700 }}
+                    sx={{
+                      mt: 7,
+                      mb: 2,
+                      fontWeight: 700,
+                      textShadow: '4px 3px #000 !important'
+                    }}
                   >
                     {post.title}
                   </Typography>

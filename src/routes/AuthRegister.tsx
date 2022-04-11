@@ -24,6 +24,7 @@ function Register() {
   const [errorMessage, setErrorMessage] = React.useState('')
   const [email, setEmail] = React.useState('')
   const [emailSent, setEmailSent] = React.useState(false)
+  const [emailResent, setEmailResent] = React.useState(false)
 
   const register = async (
     registrationFormData: React.FormEvent<HTMLFormElement>
@@ -63,6 +64,7 @@ function Register() {
       await axios.post(`${REACT_APP_AUTH_URL}/auth/resend-verification-email`, {
         email
       })
+      setEmailResent(true)
     } catch (err: any) {
       const resendVerificationError =
         err.response?.data?.resendVerificationError
@@ -90,7 +92,7 @@ function Register() {
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component='h1' variant='h5'>
+            <Typography component='h1' variant='h5' sx={{ mb: 2 }}>
               Registration
             </Typography>
 
@@ -102,23 +104,32 @@ function Register() {
                 sx={{ input: { color: 'white' }, alignItems: 'center' }}
               >
                 <Grid container spacing={1}>
+                  {!emailResent ? (
+                    <Grid item xs={12} sx={{ width: '100%' }}>
+                      <Typography component='p' variant='body1'>
+                        An email has been sent to you with a link to verify your
+                        account.
+                      </Typography>
+                      <Grid item xs={12}>
+                        <Button
+                          variant='contained'
+                          color='secondary'
+                          sx={{ mt: 2, width: '100%' }}
+                          onClick={resendVerificationEmail}
+                        >
+                          Resend verification email
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  ) : (
+                    <Grid item xs={12} sx={{ width: '100%' }}>
+                      <Typography component='p' variant='body1'>
+                        An email has been re-sent to you with a link to verify
+                        your account.
+                      </Typography>
+                    </Grid>
+                  )}
                   <Grid item xs={12} sx={{ width: '100%' }}>
-                    <Typography component='p' variant='body1'>
-                      An email has been sent to you with a link to verify your
-                      account.
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button
-                      variant='contained'
-                      color='secondary'
-                      sx={{ mt: 2, width: '100%' }}
-                      onClick={resendVerificationEmail}
-                    >
-                      Resend verification email
-                    </Button>
-                  </Grid>
-                  <Grid item xs={12}>
                     <Button
                       variant='contained'
                       sx={{ mt: 2, width: '100%' }}

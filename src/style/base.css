@@ -21,6 +21,12 @@
   color: #61dafb;
 }
 
+h1, h2, h3,
+h4, h5, h6 {
+  line-height: 100%;
+  text-shadow: 2px 2px #000;
+}
+
 .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
   border-color: white;
 }

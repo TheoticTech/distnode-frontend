@@ -24,6 +24,9 @@ import { REACT_APP_AUTH_URL } from '../config'
 function AuthLogin() {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
+  const [email, setEmail] = React.useState('')
+  const [requiresVerification, setRequiresVerification] = React.useState(false)
+  const [emailSent, setEmailSent] = React.useState(false)
   const { state }: any = useLocation()
 
   const login = async (loginFormData: React.FormEvent<HTMLFormElement>) => {
@@ -31,6 +34,9 @@ function AuthLogin() {
     const data = new FormData(loginFormData.currentTarget)
 
     try {
+      if (data.get('email') && data.get('email') !== '') {
+        setEmail(data.get('email')?.toString().toLowerCase() as string)
+      }
       const loginRes = await axios.post(
         `${REACT_APP_AUTH_URL}/auth/login`,
         {
@@ -48,7 +54,28 @@ function AuthLogin() {
     } catch (err: any) {
       const loginError = err.response?.data?.loginError
       if (loginError) {
+        if (loginError === 'Email must be verified before logging in') {
+          setRequiresVerification(true)
+        }
         setErrorMessage(loginError)
+      } else {
+        setErrorMessage('An unknown error occurred, please try again later')
+      }
+    }
+  }
+
+  const resendVerificationEmail = async () => {
+    try {
+      await axios.post(`${REACT_APP_AUTH_URL}/auth/resend-verification-email`, {
+        email
+      })
+      setEmailSent(true)
+      setErrorMessage('')
+    } catch (err: any) {
+      const resendVerificationError =
+        err.response?.data?.resendVerificationError
+      if (resendVerificationError) {
+        setErrorMessage(resendVerificationError)
       } else {
         setErrorMessage('An unknown error occurred, please try again later')
       }
@@ -105,13 +132,34 @@ function AuthLogin() {
                     autoComplete='current-password'
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  {errorMessage && (
+                {errorMessage && (
+                  <Grid item xs={12}>
                     <Typography variant='body2' color='error'>
                       Error: {errorMessage}
                     </Typography>
-                  )}
-                </Grid>
+                  </Grid>
+                )}
+                {emailSent && (
+                  <Grid item xs={12}>
+                    <Typography component='p' variant='body1'>
+                      An email has been sent to you with a link to verify your
+                      account.
+                    </Typography>
+                  </Grid>
+                )}
+                {!emailSent && requiresVerification ? (
+                  <Grid item xs={12}>
+                    <Button
+                      variant='contained'
+                      color='secondary'
+                      sx={{ mt: 2, width: '100%' }}
+                      onClick={resendVerificationEmail}
+                    >
+                      Resend verification email
+                    </Button>
+                  </Grid>
+                ) : null}
+
                 <Grid item xs={12}>
                   <Button
                     type='submit'
