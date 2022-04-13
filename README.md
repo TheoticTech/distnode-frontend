@@ -30,6 +30,7 @@ docker build -t frontend:latest .
 ```sh
 docker build \
     --build-arg REACT_APP_NAME=DistNode \
+    --build-arg REACT_APP_URL=localhost:3002 \
     --build-arg REACT_APP_API_URL=localhost:3001 \
     --build-arg REACT_APP_AUTH_URL=localhost:3000 \
     --build-arg REACT_APP_STATIC_URL=https://distnode-static-dev.sfo3.digitaloceanspaces.com \

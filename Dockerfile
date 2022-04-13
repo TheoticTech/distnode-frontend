@@ -21,13 +21,16 @@ ARG REACT_APP_STATIC_URL=https://distnode-static-dev.sfo3.digitaloceanspaces.com
 RUN npm run build
 
 ## SERVE stage
-FROM nginx:stable-alpine
+FROM nginx:stable
 
 # Copy build artifacts from build stage
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
-# Copy nginx configuration from project files
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Generate default Nginx configuration using template file
+ARG REACT_APP_URL=https://dev.distnode.com
+ENV REACT_APP_URL ${REACT_APP_URL}
+COPY ./nginx/nginx.conf.template /etc/nginx/conf.d/nginx.conf.template
+RUN envsubst '${REACT_APP_URL}' < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/default.conf
 
 # Execute app on port 80
 EXPOSE 80
