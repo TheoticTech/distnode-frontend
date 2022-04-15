@@ -174,7 +174,11 @@ function PostView({ helmetContext }: any) {
         <meta property='og:title' content={post.title} />
         <meta property='og:description' content={post.description} />
         {post.thumbnail && (
-          <meta property='og:image' content={post.thumbnail!} />
+          <meta
+            property='og:image'
+            // Use HTTP for OG images
+            content={(post.thumbnail as string).replace('https://', 'http://')}
+          />
         )}
       </Helmet>
       <Navbar activeUserID={activeUserID} />
