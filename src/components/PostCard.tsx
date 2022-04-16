@@ -9,7 +9,8 @@ import CardHeader from '@mui/material/CardHeader'
 import CardMedia from '@mui/material/CardMedia'
 import Cookies from 'js-cookie'
 import Divider from '@mui/material/Divider'
-import FavoriteIcon from '@mui/icons-material/Favorite'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import IconButton from '@mui/material/IconButton'
 import Link from '@mui/material/Link'
 import Menu from '@mui/material/Menu'
@@ -176,55 +177,56 @@ function PostCard({
           </Typography>
         )}
       </CardContent>
-      {/*
-        // Card actions not implemented yet
-        <CardActions>
-          <Grid container>
-            <Grid
-              item
-              xs={6}
+      <CardActions>
+        <Grid
+          item
+          xs={6}
+          sx={{
+            display: 'flex',
+            justifyContent: 'left'
+          }}
+        >
+          <IconButton href='/favorites'>
+            <ThumbUpIcon
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                p: 2
+                color: 'white',
+                '&:hover': {
+                  color: '#4FC1F1'
+                }
               }}
-            >
-              <Link href={`/post/view/${postID}`} underline='hover' variant='button'>
-                {linkText}
-              </Link>
-            </Grid>
-            <Grid
-              item
-              xs={6}
+            />
+          </IconButton>
+          <IconButton href='/share'>
+            <ThumbDownIcon
               sx={{
-                display: 'flex',
-                justifyContent: 'flex-end'
+                color: 'white',
+                '&:hover': {
+                  color: 'red'
+                }
               }}
-            >
-              <IconButton href='/favorites'>
-                <FavoriteIcon
-                  sx={{
-                    color: 'white',
-                    '&:hover': {
-                      color: 'red'
-                    }
-                  }}
-                />
-              </IconButton>
-              <IconButton href='/share'>
-                <ShareIcon
-                  sx={{
-                    color: 'white',
-                    '&:hover': {
-                      color: '#4FC1F1'
-                    }
-                  }}
-                />
-              </IconButton>
-            </Grid>
-          </Grid>
-        </CardActions>
-      */}
+            />
+          </IconButton>
+        </Grid>
+        <Grid
+          item
+          xs={6}
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end'
+          }}
+        >
+          <IconButton href='/share'>
+            <ShareIcon
+              sx={{
+                color: 'white',
+                '&:hover': {
+                  color: '#4FC1F1'
+                }
+              }}
+            />
+          </IconButton>
+        </Grid>
+      </CardActions>
     </Card>
   )
 }
