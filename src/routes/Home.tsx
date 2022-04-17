@@ -4,7 +4,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Container from '@mui/material/Container'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
-import { InView } from 'react-intersection-observer'
 import React from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -14,27 +13,16 @@ import { useNavigate } from 'react-router-dom'
 import { AuthError, apiHandler } from '../utils/apiHandler'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
+import { PostCardProps } from '../types/PostCardProps'
 import PostFeed from '../components/PostFeed'
 import '../style/base.css'
 
 // Configurations
 import { REACT_APP_API_URL } from '../config'
 
-// Interface for post data from API
-interface Post {
-  postID: number
-  userID: number
-  username: string
-  avatar: string
-  thumbnail: string
-  title: string
-  postCreatedAt: string
-  description: string
-}
-
 function Home() {
   const navigate = useNavigate()
-  const [posts, setPosts] = React.useState([] as Post[])
+  const [posts, setPosts] = React.useState([] as PostCardProps[])
   const [hasMore, setHasMore] = React.useState(true)
   const [activeUserID, setActiveUserID] = React.useState('')
   const [errorMessage, setErrorMessage] = React.useState('')
@@ -42,11 +30,15 @@ function Home() {
   const getPosts = async () => {
     try {
       return await apiHandler(async () => {
-        const { data } = await axios.post(`${REACT_APP_API_URL}/api/posts`, {
-          currentPosts: posts.map((post: Post) => {
-            return post.postID
-          })
-        })
+        const { data } = await axios.post(
+          `${REACT_APP_API_URL}/api/posts`,
+          {
+            currentPosts: posts.map((post: PostCardProps) => {
+              return post.postID
+            })
+          },
+          { withCredentials: true }
+        )
         if (data.posts.length === 0) {
           setHasMore(false)
         } else {
@@ -80,9 +72,28 @@ function Home() {
       }
     }
 
-    getPosts()
     getActiveUserID()
+    getPosts()
   }, [])
+
+  const onPostReaction = ({ postID, reactionType }: any) => {
+    const newPosts = posts.map((post: PostCardProps) => {
+      if (post.postID === postID) {
+        return {
+          ...post,
+          reaction: reactionType
+        }
+      }
+      return post
+    })
+    setPosts(newPosts)
+  }
+
+  const onLastIsVisible = () => {
+    if (hasMore && posts.length > 0 && !errorMessage) {
+      getPosts()
+    }
+  }
 
   return (
     <div>
@@ -109,24 +120,15 @@ function Home() {
                 )}
               </Grid>
               <Grid item xs={12}>
-                <PostFeed posts={posts} activeUserID={activeUserID} />
+                <PostFeed
+                  posts={posts}
+                  activeUserID={activeUserID}
+                  onPostReaction={onPostReaction}
+                  onLastIsVisible={onLastIsVisible}
+                />
               </Grid>
               <Grid item xs={12}>
-                <InView
-                  as='div'
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  onChange={(inView: boolean) => {
-                    if (posts.length > 0 && inView && hasMore) {
-                      getPosts()
-                    }
-                  }}
-                >
-                  {hasMore && <CircularProgress />}
-                </InView>
+                {hasMore && !errorMessage && <CircularProgress />}
               </Grid>
             </Grid>
           </Container>

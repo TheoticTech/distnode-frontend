@@ -23,7 +23,8 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 
 // Local
-import { AuthError, apiHandler } from '../utils/apiHandler'
+import { apiHandler } from '../utils/apiHandler'
+import { react } from '../utils/react'
 
 // Configurations
 import { REACT_APP_AUTH_URL, REACT_APP_API_URL } from '../config'
@@ -37,7 +38,9 @@ function PostCard({
   postID,
   title,
   createdAt,
-  description
+  description,
+  reaction,
+  onPostReaction
 }: any) {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = React.useState('')
@@ -186,26 +189,60 @@ function PostCard({
             justifyContent: 'left'
           }}
         >
-          <IconButton href='/favorites'>
-            <ThumbUpIcon
-              sx={{
-                color: 'white',
-                '&:hover': {
-                  color: '#4FC1F1'
-                }
-              }}
-            />
-          </IconButton>
-          <IconButton href='/share'>
-            <ThumbDownIcon
-              sx={{
-                color: 'white',
-                '&:hover': {
-                  color: 'red'
-                }
-              }}
-            />
-          </IconButton>
+          {activeUserID && (
+            <div>
+              <IconButton
+                onClick={async () => {
+                  react({ postID, reactionType: 'Like' })
+                  if (reaction === 'Like') {
+                    onPostReaction({ postID })
+                  } else {
+                    onPostReaction({ postID, reactionType: 'Like' })
+                  }
+                }}
+              >
+                <ThumbUpIcon
+                  sx={
+                    reaction !== 'Like'
+                      ? {
+                          color: 'white',
+                          '&:hover': {
+                            color: '#4FC1F1'
+                          }
+                        }
+                      : {
+                          color: '#4FC1F1'
+                        }
+                  }
+                />
+              </IconButton>
+              <IconButton
+                onClick={async () => {
+                  react({ postID, reactionType: 'Dislike' })
+                  if (reaction === 'Dislike') {
+                    onPostReaction({ postID })
+                  } else {
+                    onPostReaction({ postID, reactionType: 'Dislike' })
+                  }
+                }}
+              >
+                <ThumbDownIcon
+                  sx={
+                    reaction !== 'Dislike'
+                      ? {
+                          color: 'white',
+                          '&:hover': {
+                            color: 'red'
+                          }
+                        }
+                      : {
+                          color: 'red'
+                        }
+                  }
+                />
+              </IconButton>
+            </div>
+          )}
         </Grid>
         <Grid
           item
@@ -215,7 +252,19 @@ function PostCard({
             justifyContent: 'flex-end'
           }}
         >
-          <IconButton href='/share'>
+          <IconButton
+            onClick={async () => {
+              try {
+                await navigator.share({
+                  title: `DistNode`,
+                  text: `${title}: ${description}`,
+                  url: `/post/view/${postID}`
+                })
+              } catch (err) {
+                console.error(err)
+              }
+            }}
+          >
             <ShareIcon
               sx={{
                 color: 'white',

@@ -5,16 +5,22 @@ import Masonry from 'react-masonry-css'
 import baseTheme from '../style/baseTheme'
 import '../style/base.css'
 import PostCard from './PostCard'
+import { PostCardProps } from '../types/PostCardProps'
+import VisibilityTriggerWrapper from '../components/VisibilityTrigger'
 
-function PostFeed({ activeUserID, posts }: any) {
+function PostFeed({
+  posts,
+  activeUserID,
+  onPostReaction,
+  onLastIsVisible
+}: any) {
   const { values: breakpointValues } = baseTheme.breakpoints
-  // xs, sm, md, lg, xl
   const breakpointCols = {
-    default: 1,
+    default: 3,
     [breakpointValues.xs]: 1,
     [breakpointValues.sm]: 1,
-    [breakpointValues.md]: 2,
-    [breakpointValues.lg]: 3,
+    [breakpointValues.md]: 1,
+    [breakpointValues.lg]: 2,
     [breakpointValues.xl]: 3
   }
 
@@ -24,20 +30,51 @@ function PostFeed({ activeUserID, posts }: any) {
       className='masonry-grid'
       columnClassName='masonry-grid-column'
     >
-      {posts.map((post: any) => (
-        <PostCard
-          key={post.postID}
-          activeUserID={activeUserID}
-          authorUserID={post.userID}
-          authorUsername={post.username}
-          avatarSrc={post.avatar}
-          headerImageSrc={post.thumbnail}
-          postID={post.postID}
-          title={post.title}
-          createdAt={post.postCreatedAt}
-          description={post.description}
-        />
-      ))}
+      {posts.map(
+        (post: PostCardProps, index: number, array: Array<PostCardProps>) => {
+          // Wrap last post in VisibilityTriggerWrapper
+          if (array.length - 1 === index) {
+            return (
+              <VisibilityTriggerWrapper
+                key={post.postID}
+                onVisible={onLastIsVisible}
+                child={
+                  <PostCard
+                    activeUserID={activeUserID}
+                    authorUserID={post.userID}
+                    authorUsername={post.username}
+                    avatarSrc={post.avatar}
+                    headerImageSrc={post.thumbnail}
+                    postID={post.postID}
+                    title={post.title}
+                    createdAt={post.postCreatedAt}
+                    description={post.description}
+                    reaction={post.reaction}
+                    onPostReaction={onPostReaction}
+                  />
+                }
+              />
+            )
+          } else {
+            return (
+              <PostCard
+                key={post.postID}
+                activeUserID={activeUserID}
+                authorUserID={post.userID}
+                authorUsername={post.username}
+                avatarSrc={post.avatar}
+                headerImageSrc={post.thumbnail}
+                postID={post.postID}
+                title={post.title}
+                createdAt={post.postCreatedAt}
+                description={post.description}
+                reaction={post.reaction}
+                onPostReaction={onPostReaction}
+              />
+            )
+          }
+        }
+      )}
     </Masonry>
   )
 }

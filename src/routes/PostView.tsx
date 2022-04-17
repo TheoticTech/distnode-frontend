@@ -7,6 +7,8 @@ import Container from '@mui/material/Container'
 import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
 import Divider from '@mui/material/Divider'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import Grid from '@mui/material/Grid'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 import IconButton from '@mui/material/IconButton'
@@ -16,6 +18,7 @@ import MenuItem from '@mui/material/MenuItem'
 import moment from 'moment'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Paper from '@mui/material/Paper'
+import ShareIcon from '@mui/icons-material/Share'
 import Stack from '@mui/material/Stack'
 import { ThemeProvider } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -25,7 +28,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { apiHandler } from '../utils/apiHandler'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
+import { PostCardProps } from '../types/PostCardProps'
 import PostFeed from '../components/PostFeed'
+import { react } from '../utils/react'
 import '../style/base.css'
 
 // Configurations
@@ -51,10 +56,11 @@ function PostView({ helmetContext }: any) {
     description: '',
     title: '',
     body: '',
-    thumbnail: null
+    thumbnail: null,
+    reaction: null
   })
   // Other posts from the same author
-  const [authorPosts, setAuthorPosts] = React.useState([])
+  const [authorPosts, setAuthorPosts] = React.useState([] as PostCardProps[])
   const [errorMessage, setErrorMessage] = React.useState('')
   const [postCardOptionsMenuEl, setPostCardOptionsMenuEl] =
     React.useState<null | HTMLElement>(null)
@@ -166,6 +172,24 @@ function PostView({ helmetContext }: any) {
     getPostData()
     getOtherAuthorPostsData()
   }, [])
+
+  const onPostReaction = ({ reactionType }: any) => {
+    const newPost = { ...post, reaction: reactionType }
+    setPost(newPost)
+  }
+
+  const onMorePostsReaction = ({ postID, reactionType }: any) => {
+    const newPosts = authorPosts.map((post: PostCardProps) => {
+      if (post.postID === postID) {
+        return {
+          ...post,
+          reaction: reactionType
+        }
+      }
+      return post
+    })
+    setAuthorPosts(newPosts)
+  }
 
   return (
     <HelmetProvider context={helmetContext}>
@@ -331,13 +355,105 @@ function PostView({ helmetContext }: any) {
                       padding: '1rem'
                     }}
                   />
+                  <Grid
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      py: 4,
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                    }}
+                  >
+                    {activeUserID && (
+                      <>
+                        <IconButton
+                          onClick={async () => {
+                            react({ postID, reactionType: 'Like' })
+                            if (post.reaction === 'Like') {
+                              onPostReaction({ postID })
+                            } else {
+                              onPostReaction({ postID, reactionType: 'Like' })
+                            }
+                          }}
+                        >
+                          <ThumbUpIcon
+                            sx={
+                              post.reaction !== 'Like'
+                                ? {
+                                    color: 'white',
+                                    '&:hover': {
+                                      color: '#4FC1F1'
+                                    }
+                                  }
+                                : {
+                                    color: '#4FC1F1'
+                                  }
+                            }
+                          />
+                        </IconButton>
+                        <IconButton
+                          onClick={async () => {
+                            react({ postID, reactionType: 'Dislike' })
+                            if (post.reaction === 'Dislike') {
+                              onPostReaction({ postID })
+                            } else {
+                              onPostReaction({
+                                postID,
+                                reactionType: 'Dislike'
+                              })
+                            }
+                          }}
+                        >
+                          <ThumbDownIcon
+                            sx={
+                              post.reaction !== 'Dislike'
+                                ? {
+                                    color: 'white',
+                                    '&:hover': {
+                                      color: 'red'
+                                    }
+                                  }
+                                : {
+                                    color: 'red'
+                                  }
+                            }
+                          />
+                        </IconButton>
+                      </>
+                    )}
+                    <IconButton
+                      onClick={async () => {
+                        try {
+                          await navigator.share({
+                            title: `DistNode`,
+                            text: `${post.title}: ${post.description}`,
+                            url: `/post/view/${postID}`
+                          })
+                        } catch (err) {
+                          console.error(err)
+                        }
+                      }}
+                    >
+                      <ShareIcon
+                        sx={{
+                          color: 'white',
+                          '&:hover': {
+                            color: '#4FC1F1'
+                          }
+                        }}
+                      />
+                    </IconButton>
+                  </Grid>
                 </Paper>
                 {authorPosts.length > 0 && (
                   <div>
-                    <Typography variant='h3' sx={{ mt: '4em' }}>
+                    <Typography variant='h3' sx={{ mt: '2em', mb: '1em' }}>
                       More posts from {authorInfo.username}:
                     </Typography>
-                    <PostFeed posts={authorPosts} activeUserID={activeUserID} />
+                    <PostFeed
+                      posts={authorPosts}
+                      activeUserID={activeUserID}
+                      onPostReaction={onMorePostsReaction}
+                    />
                   </div>
                 )}
               </Grid>

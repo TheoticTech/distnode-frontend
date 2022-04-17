@@ -21,6 +21,7 @@ import Typography from '@mui/material/Typography'
 import { apiHandler } from '../utils/apiHandler'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
+import { PostCardProps } from '../types/PostCardProps'
 import PostFeed from '../components/PostFeed'
 import '../style/base.css'
 
@@ -40,7 +41,7 @@ function ProfileView() {
     bio: '',
     avatar: ''
   })
-  const [posts, setPosts] = React.useState([])
+  const [posts, setPosts] = React.useState([] as PostCardProps[])
   const [errorMessage, setErrorMessage] = React.useState('')
   const [profileOptionsMenuEl, setProfileOptionsMenuEl] =
     React.useState<null | HTMLElement>(null)
@@ -97,6 +98,19 @@ function ProfileView() {
     getActiveUserID()
     getProfileData()
   }, [])
+
+  const onPostReaction = ({ postID, reactionType }: any) => {
+    const newPosts = posts.map((post: PostCardProps) => {
+      if (post.postID === postID) {
+        return {
+          ...post,
+          reaction: reactionType
+        }
+      }
+      return post
+    })
+    setPosts(newPosts)
+  }
 
   return (
     <div>
@@ -255,7 +269,11 @@ function ProfileView() {
                     </Grid>
                   </Grid>
                 </Card>
-                <PostFeed posts={posts} activeUserID={activeUserID} />
+                <PostFeed
+                  posts={posts}
+                  activeUserID={activeUserID}
+                  onPostReaction={onPostReaction}
+                />
               </Grid>
             )}
           </Container>
