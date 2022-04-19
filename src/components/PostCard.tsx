@@ -89,7 +89,7 @@ function PostCard({
   }
 
   return (
-    <Card>
+    <Card sx={{ borderRadius: '8px' }}>
       <CardHeader
         avatar={
           <Link href={`/user/view/${authorUserID}`}>

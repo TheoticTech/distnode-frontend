@@ -26,6 +26,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 // Local
 import { apiHandler } from '../utils/apiHandler'
+import Comments from '../components/Comments'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
 import { PostCardProps } from '../types/PostCardProps'
@@ -59,6 +60,7 @@ function PostView({ helmetContext }: any) {
     thumbnail: null,
     reaction: null
   })
+  const [comments, setComments] = React.useState([])
   // Other posts from the same author
   const [authorPosts, setAuthorPosts] = React.useState([] as PostCardProps[])
   const [errorMessage, setErrorMessage] = React.useState('')
@@ -126,10 +128,13 @@ function PostView({ helmetContext }: any) {
         return await apiHandler(async () => {
           const { data } = await axios.get(
             `${REACT_APP_API_URL}/api/post/${postID}/`,
-            {}
+            {
+              withCredentials: true
+            }
           )
           setAuthorInfo(data.user)
           setPost(data.post)
+          setComments(data.comments)
         })
       } catch (err: any) {
         const getPostError = err.response?.data?.getPostError
@@ -444,6 +449,31 @@ function PostView({ helmetContext }: any) {
                     </IconButton>
                   </Grid>
                 </Paper>
+                <Grid sx={{ mt: 4 }}>
+                  <Typography
+                    variant='h3'
+                    sx={{ mt: '2em', mb: '1em', textAlign: 'center' }}
+                  >
+                    Comments:
+                  </Typography>
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      position: 'relative',
+                      color: 'white',
+                      textAlign: 'initial',
+                      padding: '2em'
+                    }}
+                  >
+                    {comments && comments.length > 0 ? (
+                      <Comments comments={comments} />
+                    ) : (
+                      <Typography variant='body2' sx={{ textAlign: 'center' }}>
+                        Be the first to comment!
+                      </Typography>
+                    )}
+                  </Paper>
+                </Grid>
                 {authorPosts.length > 0 && (
                   <div>
                     <Typography variant='h3' sx={{ mt: '2em', mb: '1em' }}>
