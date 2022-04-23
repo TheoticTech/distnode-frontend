@@ -242,7 +242,13 @@ function PostView({ helmetContext }: any) {
                             authorInfo.avatar ||
                             `${REACT_APP_STATIC_URL}/resources/default-avatar.png`
                           }
-                          style={{ width: '70%', borderRadius: '100%' }}
+                          style={{
+                            objectFit: 'cover',
+                            objectPosition: 'center',
+                            width: '280px',
+                            height: '280px',
+                            borderRadius: '100%'
+                          }}
                         />
                       </Link>
                     </Grid>
@@ -289,7 +295,10 @@ function PostView({ helmetContext }: any) {
                 <Grid>
                   {post.thumbnail && (
                     <Grid item xs={12} sx={{ my: 7 }}>
-                      <img src={post.thumbnail} style={{ maxWidth: '97%' }} />
+                      <img
+                        src={post.thumbnail}
+                        style={{ maxWidth: '97%', maxHeight: '75vh' }}
+                      />
                     </Grid>
                   )}
                   <Typography
@@ -461,17 +470,24 @@ function PostView({ helmetContext }: any) {
                     sx={{
                       position: 'relative',
                       color: 'white',
-                      textAlign: 'initial',
-                      padding: '2em'
+                      textAlign: 'initial'
                     }}
                   >
-                    {comments && comments.length > 0 ? (
-                      <Comments comments={comments} />
-                    ) : (
-                      <Typography variant='body2' sx={{ textAlign: 'center' }}>
-                        Be the first to comment!
-                      </Typography>
-                    )}
+                    <Comments
+                      comments={comments}
+                      onAddComment={(comment: any) => {
+                        setComments(comments.concat(comment))
+                      }}
+                      onDeleteComment={(commentID: number) => {
+                        setComments(
+                          comments.filter(
+                            (comment: any) => comment.id !== commentID
+                          )
+                        )
+                      }}
+                      postID={postID}
+                      activeUserID={activeUserID}
+                    />
                   </Paper>
                 </Grid>
                 {authorPosts.length > 0 && (

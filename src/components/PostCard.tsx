@@ -165,7 +165,7 @@ function PostCard({
         <Link href={`/post/view/${postID}`}>
           <CardMedia
             component='img'
-            sx={{ objectFit: 'contain' }}
+            sx={{ objectFit: 'contain', maxHeight: '100vh' }}
             image={headerImageSrc}
           />
         </Link>

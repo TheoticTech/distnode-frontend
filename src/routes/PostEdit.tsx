@@ -47,7 +47,6 @@ const PostEdit = () => {
           setActiveUserID(data.userID)
         })
       } catch (err: any) {
-        console.error('I WAS CALLED!', err)
         console.log('Not logged in. Requesting login now.')
         navigate('/auth/login', { state: { next: `/post/edit/${postID}` } })
       }

@@ -211,7 +211,13 @@ function ProfileView() {
                           userInfo.avatar ||
                           `${REACT_APP_STATIC_URL}/resources/default-avatar.png`
                         }
-                        style={{ width: '70%', borderRadius: '100%' }}
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: 'center',
+                          width: '280px',
+                          height: '280px',
+                          borderRadius: '100%'
+                        }}
                       />
                       {activeUserID === userID && !userInfo.avatar && (
                         <Button

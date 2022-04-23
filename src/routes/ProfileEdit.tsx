@@ -160,9 +160,12 @@ const ProfileEdit = () => {
                     <img
                       src={avatar}
                       style={{
-                        width: '70%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        width: '300px',
+                        height: '300px',
                         borderRadius: '100%',
-                        border: '1px solid white'
+                        marginBottom: '1rem'
                       }}
                     />
                     <label htmlFor='uploadAvatar'>
