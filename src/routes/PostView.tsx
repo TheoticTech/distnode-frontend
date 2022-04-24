@@ -109,6 +109,29 @@ function PostView({ helmetContext }: any) {
     }
   }
 
+  const getCommentData = async () => {
+    try {
+      return await apiHandler(async () => {
+        const { data } = await axios.get(
+          `${REACT_APP_API_URL}/api/post/${postID}/comments/`,
+          {}
+        )
+        setComments(data.comments)
+      })
+    } catch (err: any) {
+      const getCommentsError = err.response?.data?.getCommentsError
+      if (getCommentsError && err.response?.status === 404) {
+        setErrorMessage('Post not found.')
+      } else {
+        if (err.message) {
+          setErrorMessage(err.message)
+        } else {
+          setErrorMessage(err)
+        }
+      }
+    }
+  }
+
   React.useEffect(() => {
     const getActiveUserID = async () => {
       try {
@@ -134,7 +157,6 @@ function PostView({ helmetContext }: any) {
           )
           setAuthorInfo(data.user)
           setPost(data.post)
-          setComments(data.comments)
         })
       } catch (err: any) {
         const getPostError = err.response?.data?.getPostError
@@ -175,6 +197,7 @@ function PostView({ helmetContext }: any) {
 
     getActiveUserID()
     getPostData()
+    getCommentData()
     getOtherAuthorPostsData()
   }, [])
 
@@ -475,16 +498,7 @@ function PostView({ helmetContext }: any) {
                   >
                     <Comments
                       comments={comments}
-                      onAddComment={(comment: any) => {
-                        setComments(comments.concat(comment))
-                      }}
-                      onDeleteComment={(commentID: number) => {
-                        setComments(
-                          comments.filter(
-                            (comment: any) => comment.id !== commentID
-                          )
-                        )
-                      }}
+                      onCommentChange={getCommentData}
                       postID={postID}
                       activeUserID={activeUserID}
                     />

@@ -22,6 +22,7 @@ import TreeItem, {
   TreeItemContentProps,
   useTreeItem
 } from '@mui/lab/TreeItem'
+import { useNavigate } from 'react-router-dom'
 import _ from 'lodash'
 
 // Local
@@ -29,6 +30,7 @@ import { AuthError, apiHandler } from '../utils/apiHandler'
 
 // Configurations
 import { REACT_APP_API_URL, REACT_APP_AUTH_URL } from '../config'
+import { NoBackpackSharp } from '@mui/icons-material'
 
 const parseComments = (comments: any) => {
   if (!comments) {
@@ -89,7 +91,10 @@ function TransitionComponent(props: TransitionProps) {
   return <Collapse {...props} />
 }
 
-const confirmDeleteComment = async (commentID: number) => {
+const confirmDeleteComment = async (
+  commentID: number,
+  onCommentChange: any
+) => {
   // const navigate = useNavigate()
 
   if (window.confirm('Are you sure you want to delete this comment?')) {
@@ -109,7 +114,7 @@ const confirmDeleteComment = async (commentID: number) => {
             withCredentials: true
           }
         )
-        window.location.reload()
+        onCommentChange()
       })
     } catch (err: any) {
       console.error(err)
@@ -120,11 +125,13 @@ const confirmDeleteComment = async (commentID: number) => {
 const CommentBox = ({
   label = 'Reply',
   postID,
+  onCommentChange,
   rootComment,
   navigate
 }: any) => {
   const [isActive, setIsActive] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
+  const [commentText, setCommentText] = React.useState('')
 
   const addComment = async (
     commentData: React.FormEvent<HTMLFormElement>,
@@ -134,8 +141,7 @@ const CommentBox = ({
     commentData.preventDefault()
 
     try {
-      const commentText = commentData.currentTarget.commentText.value
-      if (commentText) {
+      if (commentText !== '') {
         return await apiHandler(async () => {
           await axios.post(
             rootComment
@@ -147,7 +153,8 @@ const CommentBox = ({
             },
             { withCredentials: true }
           )
-          window.location.reload()
+          onCommentChange()
+          setCommentText('')
         })
       }
     } catch (err: any) {
@@ -166,14 +173,18 @@ const CommentBox = ({
         await addComment(commentData, postID, rootComment)
       }}
       noValidate
-      sx={{ input: { color: 'white' }, width: '100%', mt: 0 }}
+      sx={{
+        input: { color: 'white' },
+        width: '100%',
+        minWidth: '200px',
+        mt: 0
+      }}
     >
       <Grid
         container
         direction='row'
         onFocus={() => setIsActive(true)}
-        // Prevent blurring before button submit is called
-        onBlur={() => setTimeout(() => setIsActive(false), 100)}
+        onBlur={() => setIsActive(false)}
       >
         <Grid item md={isActive ? 11 : 0} xs={12}>
           <TextField
@@ -187,6 +198,10 @@ const CommentBox = ({
             id='commentText'
             label={label}
             name='commentText'
+            value={commentText}
+            onChange={(e) => {
+              setCommentText(e.target.value)
+            }}
           />
         </Grid>
         <Grid
@@ -200,6 +215,8 @@ const CommentBox = ({
             fullWidth
             variant='contained'
             size='small'
+            // Prevent blurring before submit is called
+            onMouseDown={(e: any) => e.preventDefault()}
             sx={{
               alignSelf: 'center',
               height: '2rem',
@@ -270,6 +287,9 @@ const StyledTreeItem = styled((props: any) => (
     TransitionComponent={TransitionComponent}
   />
 ))(({ theme }) => ({
+  '&:hover > div': {
+    backgroundColor: 'initial'
+  },
   [`& .${treeItemClasses.iconContainer}`]: {
     '& .close': {
       opacity: 0.3
@@ -283,7 +303,14 @@ const StyledTreeItem = styled((props: any) => (
   }
 }))
 
-const renderTreeItems = (nodes: any, activeUserID: string | undefined) => {
+const renderTreeItems = (
+  nodes: any,
+  onCommentChange: any,
+  postID: number,
+  activeUserID: string | undefined,
+  navigate: any,
+  depth: number
+) => {
   return nodes.map((node: any) => {
     return (
       <StyledTreeItem
@@ -295,7 +322,8 @@ const renderTreeItems = (nodes: any, activeUserID: string | undefined) => {
             <Grid
               container
               direction='row'
-              sx={{ WebkitAlignItems: 'center', mb: '0.5rem' }}
+              wrap='nowrap'
+              sx={{ WebkitAlignItems: 'center', mb: '0.5rem', p: '0.1rem' }}
             >
               <Link href={`/user/view/${node.fromID}`} sx={{ mr: '0.5rem' }}>
                 {node.avatar ? (
@@ -306,40 +334,62 @@ const renderTreeItems = (nodes: any, activeUserID: string | undefined) => {
                   </Avatar>
                 )}
               </Link>
-              <Typography variant='body1' sx={{ fontStyle: 'italic' }}>
+              <Typography
+                variant='body1'
+                sx={{ fontStyle: 'italic', whiteSpace: 'nowrap' }}
+              >
                 {node.from}
               </Typography>
               &nbsp;
-              <Typography variant='body1' sx={{ opacity: '70%' }}>
+              <Typography
+                variant='body1'
+                sx={{ opacity: '70%', whiteSpace: 'nowrap' }}
+              >
                 -{' '}
                 {moment
                   .duration(parseInt(node.createdAt) - Date.now())
                   .humanize(true)}
               </Typography>
-            </Grid>
-            <Grid
-              container
-              direction='row'
-              sx={{ alignItems: 'center', mb: '0.5rem' }}
-            >
-              <Typography variant='body1'>{node.name}</Typography>
+              &nbsp;
               {activeUserID && activeUserID === node.fromID && (
                 <Button
                   variant='text'
                   color='secondary'
-                  onClick={async () => await confirmDeleteComment(node.id)}
+                  onClick={async () =>
+                    await confirmDeleteComment(node.id, onCommentChange)
+                  }
                 >
                   Delete
                 </Button>
               )}
             </Grid>
-            <CommentBox rootComment={node.id} />
+            <Grid
+              container
+              sx={{ alignItems: 'center', mb: '0.5rem', minWidth: '200px' }}
+            >
+              <Typography variant='body1'>{node.name}</Typography>&nbsp;
+            </Grid>
+            {depth < 7 && (
+              <CommentBox
+                onCommentChange={onCommentChange}
+                postID={postID}
+                rootComment={node.id}
+                navigate={navigate}
+              />
+            )}
           </Grid>
         }
       >
         {Object.keys(node).includes('children') && Array.isArray(node.children)
           ? node.children.map((childNode: any) =>
-              renderTreeItems([childNode], activeUserID)
+              renderTreeItems(
+                [childNode],
+                onCommentChange,
+                postID,
+                activeUserID,
+                navigate,
+                depth + 1
+              )
             )
           : null}
       </StyledTreeItem>
@@ -358,8 +408,9 @@ const getNodeIDs = (nodeArr: any[]) => {
   return nodeIDs
 }
 
-const Comments = ({ comments, postID, activeUserID }: any) => {
+const Comments = ({ comments, onCommentChange, postID, activeUserID }: any) => {
   const [expanded, setExpanded] = React.useState<string[]>([])
+  const navigate = useNavigate()
 
   const parsedComments = parseComments(comments)
 
@@ -374,8 +425,13 @@ const Comments = ({ comments, postID, activeUserID }: any) => {
   }
 
   return (
-    <div>
-      <CommentBox label={'Reply to post'} postID={postID} />
+    <div style={{ width: '100%' }}>
+      <CommentBox
+        label={'Reply to post'}
+        onCommentChange={onCommentChange}
+        postID={postID}
+        navigate={navigate}
+      />
       {parsedComments.length > 0 && (
         <TreeView
           aria-label='customized'
@@ -387,13 +443,21 @@ const Comments = ({ comments, postID, activeUserID }: any) => {
           sx={{
             height: '70vh',
             flexGrow: 1,
-            overflowY: 'auto'
+            overflowY: 'auto',
+            overflowX: 'scroll'
           }}
         >
           <Button onClick={handleExpandClick} sx={{ m: '1rem' }}>
             {expanded.length === 0 ? 'Expand all' : 'Collapse all'}
           </Button>
-          {renderTreeItems(parsedComments, activeUserID)}
+          {renderTreeItems(
+            parsedComments,
+            onCommentChange,
+            postID,
+            activeUserID,
+            navigate,
+            0
+          )}
         </TreeView>
       )}
     </div>
