@@ -34,5 +34,6 @@ docker build \
     --build-arg REACT_APP_API_URL=localhost:3001 \
     --build-arg REACT_APP_AUTH_URL=localhost:3000 \
     --build-arg REACT_APP_STATIC_URL=https://distnode-static-dev.sfo3.digitaloceanspaces.com \
+    --build-arg REACT_APP_GA_TAG=G-GXWKXCJ2TT \
     -t frontend:latest .
 ```
