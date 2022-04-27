@@ -177,7 +177,7 @@ function PostView({ helmetContext }: any) {
         return await apiHandler(async () => {
           const { data } = await axios.get(
             `${REACT_APP_API_URL}/api/post/${postID}/related/author`,
-            {}
+            { withCredentials: true }
           )
           setAuthorPosts(data.posts)
         })

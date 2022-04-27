@@ -76,7 +76,7 @@ function ProfileView() {
         return await apiHandler(async () => {
           const { data } = await axios.get(
             `${REACT_APP_API_URL}/api/user/${userID}/profile`,
-            {}
+            { withCredentials: true }
           )
           setUserInfo(data.user)
           setPosts(data.posts)
