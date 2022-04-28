@@ -54,6 +54,7 @@ function PostView({ helmetContext }: any) {
   const [post, setPost] = React.useState({
     postID: '',
     createdAt: Date.now(),
+    updatedAt: null,
     description: '',
     title: '',
     body: '',
@@ -334,6 +335,15 @@ function PostView({ helmetContext }: any) {
                     }}
                   >
                     {post.title}
+                  </Typography>
+                  <Typography variant='subtitle1' sx={{ my: 2 }}>
+                    {`Posted ${moment
+                      .duration(post.createdAt - Date.now())
+                      .humanize(true)}`}
+                    {post.updatedAt &&
+                      ` - Updated ${moment
+                        .duration(post.updatedAt - Date.now())
+                        .humanize(true)}`}
                   </Typography>
                 </Grid>
                 <Paper
