@@ -162,6 +162,7 @@ function ProfileView() {
                         MenuListProps={{
                           'aria-labelledby': 'profile-options-button'
                         }}
+                        disableAutoFocusItem
                       >
                         <MenuItem
                           onClick={() => {

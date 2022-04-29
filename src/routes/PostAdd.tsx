@@ -3,9 +3,12 @@ import React from 'react'
 import axios from 'axios'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Checkbox from '@mui/material/Checkbox'
 import Container from '@mui/material/Container'
 import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import { useNavigate } from 'react-router-dom'
 import TextField from '@mui/material/TextField'
@@ -79,6 +82,7 @@ const PostAdd = () => {
               title: data.get('title'),
               description: data.get('description'),
               body: editorRef.current.getContent(),
+              published: data.get('publish') === 'on',
               ...(thumbnail !== null && { thumbnail }),
               csrfToken: Cookies.get('csrfToken')
             },
@@ -178,6 +182,24 @@ const PostAdd = () => {
                   </Grid>
                   <Grid item xs={12}>
                     <TinyEditor innerRef={editorRef} />
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{ display: 'flex', justifyContent: 'right' }}
+                  >
+                    <FormGroup>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            defaultChecked
+                            id='publish'
+                            name='publish'
+                          />
+                        }
+                        label='Publish'
+                      />
+                    </FormGroup>
                   </Grid>
                   <Grid item xs={12}>
                     <Button

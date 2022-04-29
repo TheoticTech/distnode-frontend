@@ -372,6 +372,7 @@ function PostView({ helmetContext }: any) {
                         anchorEl={postCardOptionsMenuEl}
                         open={open}
                         onClose={handlePostCardOptionsMenuButtonClose}
+                        disableAutoFocusItem
                       >
                         <MenuItem
                           onClick={() => {
@@ -396,6 +397,7 @@ function PostView({ helmetContext }: any) {
                   ) : null}
                   <div
                     dangerouslySetInnerHTML={{ __html: post.body }}
+                    id='post-body'
                     style={{
                       fontSize: '1.2rem',
                       lineHeight: '1.5rem',

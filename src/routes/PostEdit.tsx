@@ -3,9 +3,12 @@ import React from 'react'
 import axios from 'axios'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Checkbox from '@mui/material/Checkbox'
 import Container from '@mui/material/Container'
 import Cookies from 'js-cookie'
 import CssBaseline from '@mui/material/CssBaseline'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
@@ -31,6 +34,7 @@ const PostEdit = () => {
     description: '',
     title: '',
     body: '',
+    published: true,
     thumbnail: null
   })
   const [errorMessage, setErrorMessage] = React.useState('')
@@ -98,6 +102,7 @@ const PostEdit = () => {
 
   const editPost = async (postData: React.FormEvent<HTMLFormElement>) => {
     postData.preventDefault()
+    const data = new FormData(postData.currentTarget)
 
     try {
       const content = editorRef.current.getContent()
@@ -217,6 +222,30 @@ const PostEdit = () => {
                   </Grid>
                   <Grid item xs={12}>
                     <TinyEditor innerRef={editorRef} initialValue={post.body} />
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{ display: 'flex', justifyContent: 'right' }}
+                  >
+                    <FormGroup>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={post.published}
+                            onChange={(e) =>
+                              setPost({
+                                ...post,
+                                published: e.target.checked
+                              })
+                            }
+                            id='publish'
+                            name='publish'
+                          />
+                        }
+                        label='Publish'
+                      />
+                    </FormGroup>
                   </Grid>
                   <Grid item xs={12}>
                     <Button

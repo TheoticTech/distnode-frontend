@@ -21,11 +21,11 @@ const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
         skin: 'oxide-dark',
         content_css: 'dark',
         menubar: false,
-        plugins: ['autoresize', 'image', 'lists', 'media'],
+        plugins: ['autoresize', 'image', 'lists', 'media', 'link'],
         toolbar:
           'undo redo | styles | nonsense | bold italic strikethrough underline | ' +
           'alignleft aligncenter alignright alignjustify | bullist numlist | ' +
-          'outdent indent | image media',
+          'outdent indent | link image media',
         content_style:
           'body { font-family: Roboto, Helvetica, Arial, sans-serif; font-size:14px; } ' +
           'img { max-width: 100% !important }',

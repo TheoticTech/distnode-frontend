@@ -39,6 +39,7 @@ function PostCard({
   title,
   createdAt,
   description,
+  published,
   reaction,
   onPostReaction
 }: any) {
@@ -113,6 +114,7 @@ function PostCard({
                 anchorEl={postCardOptionsMenuEl}
                 open={open}
                 onClose={handlePostCardOptionsMenuButtonClose}
+                disableAutoFocusItem
               >
                 <MenuItem
                   onClick={() => {
@@ -140,6 +142,7 @@ function PostCard({
         title={
           <Link href={`/post/view/${postID}`} underline='hover' variant='h4'>
             {title}
+            {published ? '' : ' (draft)'}
           </Link>
         }
         subheaderTypographyProps={{ variant: 'subtitle1', color: 'white' }}
@@ -181,99 +184,101 @@ function PostCard({
         )}
       </CardContent>
       <CardActions>
-        <Grid
-          item
-          xs={6}
-          sx={{
-            display: 'flex',
-            justifyContent: 'left'
-          }}
-        >
-          {activeUserID && (
-            <div>
-              <IconButton
-                onClick={async () => {
-                  react({ postID, reactionType: 'Like' })
-                  if (reaction === 'Like') {
-                    onPostReaction({ postID })
-                  } else {
-                    onPostReaction({ postID, reactionType: 'Like' })
-                  }
-                }}
-              >
-                <ThumbUpIcon
-                  sx={
-                    reaction !== 'Like'
-                      ? {
-                          color: 'white',
-                          '&:hover': {
-                            color: '#4FC1F1'
-                          }
-                        }
-                      : {
-                          color: '#4FC1F1'
-                        }
-                  }
-                />
-              </IconButton>
-              <IconButton
-                onClick={async () => {
-                  react({ postID, reactionType: 'Dislike' })
-                  if (reaction === 'Dislike') {
-                    onPostReaction({ postID })
-                  } else {
-                    onPostReaction({ postID, reactionType: 'Dislike' })
-                  }
-                }}
-              >
-                <ThumbDownIcon
-                  sx={
-                    reaction !== 'Dislike'
-                      ? {
-                          color: 'white',
-                          '&:hover': {
-                            color: 'red'
-                          }
-                        }
-                      : {
-                          color: 'red'
-                        }
-                  }
-                />
-              </IconButton>
-            </div>
-          )}
-        </Grid>
-        <Grid
-          item
-          xs={6}
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end'
-          }}
-        >
-          <IconButton
-            onClick={async () => {
-              try {
-                await navigator.share({
-                  title: `DistNode`,
-                  text: `${title}: ${description}`,
-                  url: `/post/view/${postID}`
-                })
-              } catch (err) {
-                console.error(err)
-              }
+        <Grid container sx={{ justify: 'space-between' }}>
+          <Grid
+            item
+            xs={6}
+            sx={{
+              display: 'flex',
+              justifyContent: 'left'
             }}
           >
-            <ShareIcon
-              sx={{
-                color: 'white',
-                '&:hover': {
-                  color: '#4FC1F1'
+            {activeUserID && (
+              <div>
+                <IconButton
+                  onClick={async () => {
+                    react({ postID, reactionType: 'Like' })
+                    if (reaction === 'Like') {
+                      onPostReaction({ postID })
+                    } else {
+                      onPostReaction({ postID, reactionType: 'Like' })
+                    }
+                  }}
+                >
+                  <ThumbUpIcon
+                    sx={
+                      reaction !== 'Like'
+                        ? {
+                            color: 'white',
+                            '&:hover': {
+                              color: '#4FC1F1'
+                            }
+                          }
+                        : {
+                            color: '#4FC1F1'
+                          }
+                    }
+                  />
+                </IconButton>
+                <IconButton
+                  onClick={async () => {
+                    react({ postID, reactionType: 'Dislike' })
+                    if (reaction === 'Dislike') {
+                      onPostReaction({ postID })
+                    } else {
+                      onPostReaction({ postID, reactionType: 'Dislike' })
+                    }
+                  }}
+                >
+                  <ThumbDownIcon
+                    sx={
+                      reaction !== 'Dislike'
+                        ? {
+                            color: 'white',
+                            '&:hover': {
+                              color: 'red'
+                            }
+                          }
+                        : {
+                            color: 'red'
+                          }
+                    }
+                  />
+                </IconButton>
+              </div>
+            )}
+          </Grid>
+          <Grid
+            item
+            xs={6}
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end'
+            }}
+          >
+            <IconButton
+              onClick={async () => {
+                try {
+                  await navigator.share({
+                    title: `DistNode`,
+                    text: `${title}: ${description}`,
+                    url: `/post/view/${postID}`
+                  })
+                } catch (err) {
+                  console.error(err)
                 }
               }}
-            />
-          </IconButton>
+            >
+              <ShareIcon
+                sx={{
+                  color: 'white',
+                  '&:hover': {
+                    color: '#4FC1F1'
+                  }
+                }}
+              />
+            </IconButton>
+          </Grid>
         </Grid>
       </CardActions>
     </Card>

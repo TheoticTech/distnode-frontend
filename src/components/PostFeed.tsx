@@ -29,6 +29,7 @@ function PostFeed({
       breakpointCols={breakpointCols}
       className='masonry-grid'
       columnClassName='masonry-grid-column'
+      style={{ marginTop: '2em', marginBottom: '2em' }}
     >
       {posts.map(
         (post: PostCardProps, index: number, array: Array<PostCardProps>) => {
@@ -49,6 +50,7 @@ function PostFeed({
                     title={post.title}
                     createdAt={post.postCreatedAt}
                     description={post.description}
+                    published={post.published}
                     reaction={post.reaction}
                     onPostReaction={onPostReaction}
                   />
@@ -68,6 +70,7 @@ function PostFeed({
                 title={post.title}
                 createdAt={post.postCreatedAt}
                 description={post.description}
+                published={post.published}
                 reaction={post.reaction}
                 onPostReaction={onPostReaction}
               />

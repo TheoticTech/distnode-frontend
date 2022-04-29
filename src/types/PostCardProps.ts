@@ -7,5 +7,6 @@ export interface PostCardProps {
   title: string
   postCreatedAt: string
   description: string
+  published: boolean
   reaction: string
 }

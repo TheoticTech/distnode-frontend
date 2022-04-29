@@ -104,7 +104,6 @@ function Home() {
             component='main'
             maxWidth={'xl'}
             sx={{
-              my: 7,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'

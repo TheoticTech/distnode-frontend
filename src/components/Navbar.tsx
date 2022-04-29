@@ -101,6 +101,7 @@ const Navbar = ({ activeUserID }: any) => {
       }}
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
+      disableAutoFocusItem
     >
       <MenuItem>
         <StyledMenuItemLink href='/'>
