@@ -17,6 +17,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import moment from 'moment'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+import Popover from '@mui/material/Popover'
 import { useNavigate } from 'react-router-dom'
 import ShareIcon from '@mui/icons-material/Share'
 import Typography from '@mui/material/Typography'
@@ -57,6 +58,17 @@ function PostCard({
   const handlePostCardOptionsMenuButtonClose = () => {
     setPostCardOptionsMenuEl(null)
   }
+
+  const [popoverAnchorEl, setPopoverAnchorEl] =
+    React.useState<null | HTMLElement>(null)
+  const handlePopoverClick = (event: React.MouseEvent<HTMLElement>) => {
+    setPopoverAnchorEl(popoverAnchorEl ? null : event.currentTarget)
+  }
+  const handlePopoverClose = () => {
+    setPopoverAnchorEl(null)
+  }
+  const popoverOpen = Boolean(popoverAnchorEl)
+  const id = popoverOpen ? 'simple-popover' : undefined
 
   const confirmDeletePost = async (postID: number) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
@@ -193,60 +205,80 @@ function PostCard({
               justifyContent: 'left'
             }}
           >
-            {activeUserID && (
-              <div>
-                <IconButton
-                  onClick={async () => {
+            <div>
+              <IconButton
+                onClick={async (e) => {
+                  if (activeUserID) {
                     react({ postID, reactionType: 'Like' })
                     if (reaction === 'Like') {
                       onPostReaction({ postID })
                     } else {
                       onPostReaction({ postID, reactionType: 'Like' })
                     }
-                  }}
-                >
-                  <ThumbUpIcon
-                    sx={
-                      reaction !== 'Like'
-                        ? {
-                            color: 'white',
-                            '&:hover': {
-                              color: '#4FC1F1'
-                            }
-                          }
-                        : {
+                  } else {
+                    handlePopoverClick(e)
+                  }
+                }}
+              >
+                <ThumbUpIcon
+                  sx={
+                    reaction !== 'Like'
+                      ? {
+                          color: 'white',
+                          '&:hover': {
                             color: '#4FC1F1'
                           }
-                    }
-                  />
-                </IconButton>
-                <IconButton
-                  onClick={async () => {
+                        }
+                      : {
+                          color: '#4FC1F1'
+                        }
+                  }
+                />
+              </IconButton>
+              <IconButton
+                onClick={async (e) => {
+                  if (activeUserID) {
                     react({ postID, reactionType: 'Dislike' })
                     if (reaction === 'Dislike') {
                       onPostReaction({ postID })
                     } else {
                       onPostReaction({ postID, reactionType: 'Dislike' })
                     }
-                  }}
-                >
-                  <ThumbDownIcon
-                    sx={
-                      reaction !== 'Dislike'
-                        ? {
-                            color: 'white',
-                            '&:hover': {
-                              color: 'red'
-                            }
-                          }
-                        : {
+                  } else {
+                    handlePopoverClick(e)
+                  }
+                }}
+              >
+                <ThumbDownIcon
+                  sx={
+                    reaction !== 'Dislike'
+                      ? {
+                          color: 'white',
+                          '&:hover': {
                             color: 'red'
                           }
-                    }
-                  />
-                </IconButton>
-              </div>
-            )}
+                        }
+                      : {
+                          color: 'red'
+                        }
+                  }
+                />
+              </IconButton>
+              <Popover
+                id={id}
+                open={popoverOpen}
+                anchorEl={popoverAnchorEl}
+                onClose={handlePopoverClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left'
+                }}
+              >
+                <Typography sx={{ p: 2 }}>
+                  <Link href={'/auth/login'}>Login</Link> to react
+                </Typography>
+              </Popover>
+            </div>
           </Grid>
           <Grid
             item

@@ -1,7 +1,6 @@
 // Third party
 import React from 'react'
 import axios from 'axios'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Container from '@mui/material/Container'
 import Cookies from 'js-cookie'
@@ -18,6 +17,7 @@ import MenuItem from '@mui/material/MenuItem'
 import moment from 'moment'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import Paper from '@mui/material/Paper'
+import Popover from '@mui/material/Popover'
 import ShareIcon from '@mui/icons-material/Share'
 import Stack from '@mui/material/Stack'
 import { ThemeProvider } from '@mui/material/styles'
@@ -78,6 +78,18 @@ function PostView({ helmetContext }: any) {
   const handlePostCardOptionsMenuButtonClose = () => {
     setPostCardOptionsMenuEl(null)
   }
+
+  const [popoverAnchorEl, setPopoverAnchorEl] =
+    React.useState<null | HTMLElement>(null)
+
+  const handlePopoverClick = (event: React.MouseEvent<HTMLElement>) => {
+    setPopoverAnchorEl(popoverAnchorEl ? null : event.currentTarget)
+  }
+  const handlePopoverClose = () => {
+    setPopoverAnchorEl(null)
+  }
+  const popoverOpen = Boolean(popoverAnchorEl)
+  const id = popoverOpen ? 'simple-popover' : undefined
 
   const confirmDeletePost = async (postID: number) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
@@ -412,35 +424,39 @@ function PostView({ helmetContext }: any) {
                       backgroundColor: 'rgba(0, 0, 0, 0.5)'
                     }}
                   >
-                    {activeUserID && (
-                      <>
-                        <IconButton
-                          onClick={async () => {
+                    <div>
+                      <IconButton
+                        onClick={async (e) => {
+                          if (activeUserID) {
                             react({ postID, reactionType: 'Like' })
                             if (post.reaction === 'Like') {
                               onPostReaction({ postID })
                             } else {
                               onPostReaction({ postID, reactionType: 'Like' })
                             }
-                          }}
-                        >
-                          <ThumbUpIcon
-                            sx={
-                              post.reaction !== 'Like'
-                                ? {
-                                    color: 'white',
-                                    '&:hover': {
-                                      color: '#4FC1F1'
-                                    }
-                                  }
-                                : {
+                          } else {
+                            handlePopoverClick(e)
+                          }
+                        }}
+                      >
+                        <ThumbUpIcon
+                          sx={
+                            post.reaction !== 'Like'
+                              ? {
+                                  color: 'white',
+                                  '&:hover': {
                                     color: '#4FC1F1'
                                   }
-                            }
-                          />
-                        </IconButton>
-                        <IconButton
-                          onClick={async () => {
+                                }
+                              : {
+                                  color: '#4FC1F1'
+                                }
+                          }
+                        />
+                      </IconButton>
+                      <IconButton
+                        onClick={async (e) => {
+                          if (activeUserID) {
                             react({ postID, reactionType: 'Dislike' })
                             if (post.reaction === 'Dislike') {
                               onPostReaction({ postID })
@@ -450,25 +466,41 @@ function PostView({ helmetContext }: any) {
                                 reactionType: 'Dislike'
                               })
                             }
-                          }}
-                        >
-                          <ThumbDownIcon
-                            sx={
-                              post.reaction !== 'Dislike'
-                                ? {
-                                    color: 'white',
-                                    '&:hover': {
-                                      color: 'red'
-                                    }
-                                  }
-                                : {
+                          } else {
+                            handlePopoverClick(e)
+                          }
+                        }}
+                      >
+                        <ThumbDownIcon
+                          sx={
+                            post.reaction !== 'Dislike'
+                              ? {
+                                  color: 'white',
+                                  '&:hover': {
                                     color: 'red'
                                   }
-                            }
-                          />
-                        </IconButton>
-                      </>
-                    )}
+                                }
+                              : {
+                                  color: 'red'
+                                }
+                          }
+                        />
+                      </IconButton>
+                      <Popover
+                        id={id}
+                        open={popoverOpen}
+                        anchorEl={popoverAnchorEl}
+                        onClose={handlePopoverClose}
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'left'
+                        }}
+                      >
+                        <Typography sx={{ p: 2 }}>
+                          <Link href={'/auth/login'}>Login</Link> to react
+                        </Typography>
+                      </Popover>
+                    </div>
                     <IconButton
                       onClick={async () => {
                         try {
