@@ -1,23 +1,25 @@
 // Third party
 import React from 'react'
-import { styled, alpha } from '@mui/material/styles'
-import AppBar from '@mui/material/AppBar'
-import Box from '@mui/material/Box'
-import Toolbar from '@mui/material/Toolbar'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import InputBase from '@mui/material/InputBase'
-import HomeIcon from '@mui/icons-material/Home'
-import Badge from '@mui/material/Badge'
-import Link from '@mui/material/Link'
-import MenuItem from '@mui/material/MenuItem'
-import Menu from '@mui/material/Menu'
-import SearchIcon from '@mui/icons-material/Search'
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import MailIcon from '@mui/icons-material/Mail'
 import AddIcon from '@mui/icons-material/Add'
-import NotificationsIcon from '@mui/icons-material/Notifications'
+import AppBar from '@mui/material/AppBar'
+import Badge from '@mui/material/Badge'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
+import HomeIcon from '@mui/icons-material/Home'
+import IconButton from '@mui/material/IconButton'
+import InputBase from '@mui/material/InputBase'
+import Link from '@mui/material/Link'
+import MailIcon from '@mui/icons-material/Mail'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import MoreIcon from '@mui/icons-material/MoreVert'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import SearchIcon from '@mui/icons-material/Search'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import { styled, alpha } from '@mui/material/styles'
+import { useNavigate } from 'react-router-dom'
 
 // Configurations
 import { REACT_APP_NAME } from '../config'
@@ -72,9 +74,24 @@ const StyledMenuItemLink = styled(Link)(({ theme }) => ({
 }))
 
 const Navbar = ({ activeUserID }: any) => {
+  const navigate = useNavigate()
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
+
+  const [addPostMenuEl, setAddPostMenuEl] = React.useState<null | HTMLElement>(
+    null
+  )
+  const addPostMenuOpen = Boolean(addPostMenuEl)
+
+  const handleAddPostMenuButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAddPostMenuEl(event.currentTarget)
+  }
+  const handleAddPostMenuClose = () => {
+    setAddPostMenuEl(null)
+  }
 
   // Menu handlers
   const handleMobileMenuClose = () => {
@@ -182,11 +199,34 @@ const Navbar = ({ activeUserID }: any) => {
 
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <IconButton size='large' aria-label='create new' color='inherit'>
-                <StyledMenuItemLink href='/post/add'>
-                  <AddIcon />
-                </StyledMenuItemLink>
+              <IconButton onClick={handleAddPostMenuButtonClick}>
+                <AddIcon sx={{ color: 'white' }} />
               </IconButton>
+              <Menu
+                id='add-post-options-menu'
+                anchorEl={addPostMenuEl}
+                open={addPostMenuOpen}
+                onClose={handleAddPostMenuClose}
+                disableAutoFocusItem
+              >
+                <MenuItem
+                  onClick={() => {
+                    handleAddPostMenuClose()
+                    navigate('/post/add/?type=blog')
+                  }}
+                >
+                  Blog Post
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    handleAddPostMenuClose()
+                    navigate('/post/add/?type=link')
+                  }}
+                >
+                  Link Post
+                </MenuItem>
+              </Menu>
 
               {/*
                 // Messages not implemented yet
