@@ -134,7 +134,7 @@ const PostAdd = () => {
                 {
                   title,
                   description,
-                  body: `<p>View link <a href="${link}" target="_blank">here</a></p>`,
+                  body: `<p><a href="${link}" target="_blank">${link}</a></p>`,
                   published: data.get('publish') === 'on',
                   ...(image !== null && { thumbnail: image }),
                   csrfToken: Cookies.get('csrfToken')
