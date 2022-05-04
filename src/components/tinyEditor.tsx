@@ -88,31 +88,40 @@ const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
           input.setAttribute('type', 'file')
           input.setAttribute('accept', 'image/* video/* audio/*')
           input.onchange = function () {
-            const file = this.files[0]
-            const reader = new FileReader()
-            reader.onload = async function () {
-              await apiHandler(async () => {
-                const fd = new FormData()
-                fd.append('media', file)
-                fd.append('csrfToken', Cookies.get('csrfToken') as string)
-                const response: any = await axios({
-                  method: 'post',
-                  url: `${REACT_APP_API_URL}/api/media/upload`,
-                  data: fd,
-                  withCredentials: true
+            try {
+              innerRef.current.dom.doc.mostRecentWindow.block(
+                'Uploading file...'
+              )
+              const file = this.files[0]
+              const reader = new FileReader()
+              reader.onload = async function () {
+                await apiHandler(async () => {
+                  const fd = new FormData()
+                  fd.append('media', file)
+                  fd.append('csrfToken', Cookies.get('csrfToken') as string)
+                  const response: any = await axios({
+                    method: 'post',
+                    url: `${REACT_APP_API_URL}/api/media/upload`,
+                    data: fd,
+                    withCredentials: true
+                  })
+                  innerRef.current.dom.doc.mostRecentWindow.unblock()
+                  callback(response.data.file.location, {
+                    title: response.data.file.originalname
+                  })
                 })
-                callback(response.data.file.location, {
-                  title: response.data.file.originalname
-                })
-              })
+              }
+              reader.readAsDataURL(file)
+            } catch (e) {
+              console.log('Unable to upload file')
+              innerRef.current.dom.doc.mostRecentWindow.unblock()
             }
-            reader.readAsDataURL(file)
           }
           input.click()
         },
         image_dimensions: false,
-        // Remove/disable the 'Embed' and 'Advanced' media menu items
         setup: function (editor) {
+          // Remove/disable the 'Embed' and 'Advanced' media menu items
           editor.on('ExecCommand', (event) => {
             const command = event.command
             if (command === 'mceMedia') {
@@ -128,7 +137,10 @@ const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
                 }
               })
             }
-          })
+          }),
+            editor.on('OpenWindow', (event) => {
+              innerRef.current.dom.doc.mostRecentWindow = event.dialog
+            })
         }
       }}
     />
