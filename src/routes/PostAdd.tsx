@@ -60,7 +60,9 @@ const PostAdd = () => {
         })
       } catch (err: any) {
         console.log('Not logged in. Requesting login now.')
-        navigate('/auth/login', { state: { next: '/post/add' } })
+        navigate('/auth/login', {
+          state: { next: `/post/add/?type=${searchParams.get('type')}` }
+        })
       }
     }
     getActiveUserID()
