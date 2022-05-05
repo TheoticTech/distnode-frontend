@@ -83,41 +83,45 @@ const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
           }
         },
         file_picker_types: 'image media',
-        file_picker_callback: async function (callback, value, meta) {
-          const input = document.createElement('input') as any
-          input.setAttribute('type', 'file')
-          input.setAttribute('accept', 'image/* video/* audio/*')
-          input.onchange = function () {
-            try {
-              innerRef.current.dom.doc.mostRecentWindow.block(
-                'Uploading file...'
-              )
+        file_picker_callback: function (callback, value, meta) {
+          try {
+            const input = document.createElement('input') as any
+            input.setAttribute('type', 'file')
+            input.setAttribute('accept', 'image/* video/* audio/*')
+            input.onchange = function () {
               const file = this.files[0]
               const reader = new FileReader()
               reader.onload = async function () {
-                await apiHandler(async () => {
-                  const fd = new FormData()
-                  fd.append('media', file)
-                  fd.append('csrfToken', Cookies.get('csrfToken') as string)
-                  const response: any = await axios({
-                    method: 'post',
-                    url: `${REACT_APP_API_URL}/api/media/upload`,
-                    data: fd,
-                    withCredentials: true
+                try {
+                  await apiHandler(async () => {
+                    innerRef.current.dom.doc.mostRecentWindow.block(
+                      'Uploading file...'
+                    )
+                    const fd = new FormData()
+                    fd.append('media', file)
+                    fd.append('csrfToken', Cookies.get('csrfToken') as string)
+                    const response: any = await axios({
+                      method: 'post',
+                      url: `${REACT_APP_API_URL}/api/media/upload`,
+                      data: fd,
+                      withCredentials: true
+                    })
+                    innerRef.current.dom.doc.mostRecentWindow.unblock()
+                    callback(response.data.file.location, {
+                      title: response.data.file.originalname
+                    })
                   })
+                } catch (e) {
+                  console.log('File selection failed: error during upload')
                   innerRef.current.dom.doc.mostRecentWindow.unblock()
-                  callback(response.data.file.location, {
-                    title: response.data.file.originalname
-                  })
-                })
+                }
               }
               reader.readAsDataURL(file)
-            } catch (e) {
-              console.log('Unable to upload file')
-              innerRef.current.dom.doc.mostRecentWindow.unblock()
             }
+            input.click()
+          } catch (e) {
+            console.log('File selection failed.')
           }
-          input.click()
         },
         image_dimensions: false,
         setup: function (editor) {
