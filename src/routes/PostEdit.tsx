@@ -44,38 +44,53 @@ const PostEdit = () => {
   React.useEffect(() => {
     const getActiveUserID = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
-            withCredentials: true
-          })
-          setActiveUserID(data.userID)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/id`,
+              {
+                withCredentials: true
+              }
+            )
+            setActiveUserID(data.userID)
+          },
+          onError: () => {
+            console.error('Not logged in. Requesting login now.')
+            navigate('/auth/login', { state: { next: `/post/edit/${postID}` } })
+          }
         })
       } catch (err: any) {
-        console.log('Not logged in. Requesting login now.')
-        navigate('/auth/login', { state: { next: `/post/edit/${postID}` } })
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostEdit - getActiveUserID'
+        )
       }
     }
 
     const getPostData = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(
-            `${REACT_APP_API_URL}/api/post/${postID}/`,
-            {}
-          )
-          setPost(data.post)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/post/${postID}/`,
+              {}
+            )
+            setPost(data.post)
+          },
+          onError: ({ error }: any) => {
+            const getPostError = error.response?.data?.getPostError
+            if (getPostError && error.response?.status === 404) {
+              setErrorMessage('Post not found.')
+            } else {
+              console.error('Unable to get post data, please try again later.')
+            }
+          }
         })
       } catch (err: any) {
-        const getPostError = err.response?.data?.getPostError
-        if (getPostError && err.response?.status === 404) {
-          setErrorMessage('Post not found.')
-        } else {
-          if (err.message) {
-            setErrorMessage(err.message)
-          } else {
-            setErrorMessage(err)
-          }
-        }
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostEdit - getPostData'
+        )
       }
     }
 
@@ -85,56 +100,63 @@ const PostEdit = () => {
 
   const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      await apiHandler(async () => {
-        const fd = new FormData()
-        fd.append('media', e.target.files![0])
-        fd.append('csrfToken', Cookies.get('csrfToken') as string)
-        const response: any = await axios({
-          method: 'post',
-          url: `${REACT_APP_API_URL}/api/media/upload`,
-          data: fd,
-          withCredentials: true
-        })
-        setPost({ ...post, thumbnail: response.data.file.location })
+      await apiHandler({
+        apiCall: async () => {
+          const fd = new FormData()
+          fd.append('media', e.target.files![0])
+          fd.append('csrfToken', Cookies.get('csrfToken') as string)
+          const response: any = await axios({
+            method: 'post',
+            url: `${REACT_APP_API_URL}/api/media/upload`,
+            data: fd,
+            withCredentials: true
+          })
+          setPost({ ...post, thumbnail: response.data.file.location })
+        },
+        onError: () => {
+          console.error('Unable to change image, please try again later.')
+        }
       })
     }
   }
 
   const editPost = async (postData: React.FormEvent<HTMLFormElement>) => {
     postData.preventDefault()
-    const data = new FormData(postData.currentTarget)
 
     try {
       const content = editorRef.current.getContent()
       if (!content) {
         setErrorMessage('Post body must not be empty')
       } else {
-        return await apiHandler(async () => {
-          await axios.post(
-            `${REACT_APP_API_URL}/api/posts/edit/${postID}`,
-            {
-              ...post,
-              body: editorRef.current.getContent(),
-              csrfToken: Cookies.get('csrfToken')
-            },
-            { withCredentials: true }
-          )
-          navigate('/')
+        return await apiHandler({
+          apiCall: async () => {
+            await axios.post(
+              `${REACT_APP_API_URL}/api/posts/edit/${postID}`,
+              {
+                ...post,
+                body: editorRef.current.getContent(),
+                csrfToken: Cookies.get('csrfToken')
+              },
+              { withCredentials: true }
+            )
+            navigate('/')
+          },
+          onError: ({ error }: any) => {
+            if (error instanceof AuthError) {
+              navigate('/auth/login')
+            } else {
+              const editPostError = error.response?.data?.editPostError
+              if (editPostError) {
+                setErrorMessage(editPostError)
+              } else {
+                setErrorMessage('Unable to edit post, please try again later.')
+              }
+            }
+          }
         })
       }
     } catch (err: any) {
-      if (err instanceof AuthError) {
-        navigate('/auth/login')
-      } else {
-        const editPostError = err.response?.data?.editPostError
-        if (editPostError) {
-          setErrorMessage(editPostError)
-        } else if (err.message) {
-          setErrorMessage(err.message)
-        } else {
-          setErrorMessage(err)
-        }
-      }
+      console.error('An error occurred', 'PostEdit - editPost')
     }
   }
 

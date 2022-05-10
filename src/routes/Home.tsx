@@ -7,10 +7,9 @@ import Grid from '@mui/material/Grid'
 import React from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-import { useNavigate } from 'react-router-dom'
 
 // Local
-import { AuthError, apiHandler } from '../utils/apiHandler'
+import { apiHandler } from '../utils/apiHandler'
 import baseTheme from '../style/baseTheme'
 import Navbar from '../components/Navbar'
 import { PostCardProps } from '../types/PostCardProps'
@@ -21,54 +20,65 @@ import '../style/base.css'
 import { REACT_APP_API_URL } from '../config'
 
 function Home() {
-  const navigate = useNavigate()
   const [posts, setPosts] = React.useState([] as PostCardProps[])
   const [hasMore, setHasMore] = React.useState(true)
   const [activeUserID, setActiveUserID] = React.useState('')
-  const [errorMessage, setErrorMessage] = React.useState('')
+  const [hasError, setHasError] = React.useState(false)
 
   const getPosts = async () => {
     try {
-      return await apiHandler(async () => {
-        const { data } = await axios.post(
-          `${REACT_APP_API_URL}/api/posts`,
-          {
-            currentPosts: posts.map((post: PostCardProps) => {
-              return post.postID
-            })
-          },
-          { withCredentials: true }
-        )
-        if (data.posts.length === 0) {
-          setHasMore(false)
-        } else {
-          setPosts((currentPosts) => [...currentPosts, ...data.posts])
+      return await apiHandler({
+        refreshToken: false,
+        apiCall: async () => {
+          const { data } = await axios.post(
+            `${REACT_APP_API_URL}/api/posts`,
+            {
+              currentPosts: posts.map((post: PostCardProps) => {
+                return post.postID
+              })
+            },
+            { withCredentials: true }
+          )
+          if (data.posts.length === 0) {
+            setHasMore(false)
+          } else {
+            setPosts((currentPosts) => [...currentPosts, ...data.posts])
+          }
+        },
+        onError: ({ error }: any) => {
+          setHasError(true)
         }
       })
     } catch (err: any) {
-      if (err instanceof AuthError) {
-        navigate('/auth/login')
-      } else {
-        if (err.message) {
-          setErrorMessage(err.message)
-        } else {
-          setErrorMessage(err)
-        }
-      }
+      console.error(
+        'An error occurred while calling apiHandler',
+        'Home - getPosts'
+      )
     }
   }
 
   React.useEffect(() => {
     const getActiveUserID = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
-            withCredentials: true
-          })
-          setActiveUserID(data.userID)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/id`,
+              {
+                withCredentials: true
+              }
+            )
+            setActiveUserID(data.userID)
+          },
+          onError: () => {
+            console.log('Not logged in. Viewing in guest mode.')
+          }
         })
       } catch (err: any) {
-        console.log('Not logged in. Viewing in guest mode.')
+        console.error(
+          'An error occurred while calling apiHandler',
+          'Home - getActiveUserID'
+        )
       }
     }
 
@@ -90,7 +100,7 @@ function Home() {
   }
 
   const onLastIsVisible = () => {
-    if (hasMore && posts.length > 0 && !errorMessage) {
+    if (hasMore && posts.length > 0 && !hasError) {
       getPosts()
     }
   }
@@ -112,9 +122,9 @@ function Home() {
             <CssBaseline />
             <Grid container spacing={1}>
               <Grid item xs={12}>
-                {errorMessage && (
+                {hasError && (
                   <Typography variant='h6' color='error'>
-                    {errorMessage}
+                    An error has occurred. Please try again later.
                   </Typography>
                 )}
               </Grid>
@@ -127,7 +137,7 @@ function Home() {
                 />
               </Grid>
               <Grid item xs={12}>
-                {hasMore && !errorMessage && <CircularProgress />}
+                {hasMore && !hasError && <CircularProgress />}
               </Grid>
             </Grid>
           </Container>

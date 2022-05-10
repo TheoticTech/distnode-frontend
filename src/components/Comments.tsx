@@ -29,8 +29,7 @@ import _ from 'lodash'
 import { AuthError, apiHandler } from '../utils/apiHandler'
 
 // Configurations
-import { REACT_APP_API_URL, REACT_APP_AUTH_URL } from '../config'
-import { NoBackpackSharp } from '@mui/icons-material'
+import { REACT_APP_API_URL } from '../config'
 
 const parseComments = (comments: any) => {
   if (!comments) {
@@ -95,29 +94,30 @@ const confirmDeleteComment = async (
   commentID: number,
   onCommentChange: any
 ) => {
-  // const navigate = useNavigate()
-
   if (window.confirm('Are you sure you want to delete this comment?')) {
     try {
-      // First, ensure user has fresh CSRF token
-      await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
-        withCredentials: true
-      })
-      // Then, delete post
-      await apiHandler(async () => {
-        await axios.delete(
-          `${REACT_APP_API_URL}/api/comments/delete/${commentID}`,
-          {
-            data: {
-              csrfToken: Cookies.get('csrfToken')
-            },
-            withCredentials: true
-          }
-        )
-        onCommentChange()
+      await apiHandler({
+        apiCall: async () => {
+          await axios.delete(
+            `${REACT_APP_API_URL}/api/comments/delete/${commentID}`,
+            {
+              data: {
+                csrfToken: Cookies.get('csrfToken')
+              },
+              withCredentials: true
+            }
+          )
+          onCommentChange()
+        },
+        onError: () => {
+          console.error('Unable to delete comment, please try again later.')
+        }
       })
     } catch (err: any) {
-      console.error(err)
+      console.error(
+        'An error occurred while calling apiHandler',
+        'Comments - confirmDeleteComment'
+      )
     }
   }
 }
@@ -130,7 +130,6 @@ const CommentBox = ({
   navigate
 }: any) => {
   const [isActive, setIsActive] = React.useState(false)
-  const [errorMessage, setErrorMessage] = React.useState('')
   const [commentText, setCommentText] = React.useState('')
 
   const addComment = async (
@@ -142,27 +141,35 @@ const CommentBox = ({
 
     try {
       if (commentText !== '') {
-        return await apiHandler(async () => {
-          await axios.post(
-            rootComment
-              ? `${REACT_APP_API_URL}/api/posts/${postID}/comment/${rootComment}/reply`
-              : `${REACT_APP_API_URL}/api/posts/${postID}/comment`,
-            {
-              comment: commentText,
-              csrfToken: Cookies.get('csrfToken')
-            },
-            { withCredentials: true }
-          )
-          onCommentChange()
-          setCommentText('')
+        return await apiHandler({
+          apiCall: async () => {
+            await axios.post(
+              rootComment
+                ? `${REACT_APP_API_URL}/api/posts/${postID}/comment/${rootComment}/reply`
+                : `${REACT_APP_API_URL}/api/posts/${postID}/comment`,
+              {
+                comment: commentText,
+                csrfToken: Cookies.get('csrfToken')
+              },
+              { withCredentials: true }
+            )
+            onCommentChange()
+            setCommentText('')
+          },
+          onError: ({ error }: any) => {
+            if (error instanceof AuthError) {
+              navigate('/auth/login', {
+                state: { next: `/post/view/${postID}` }
+              })
+            }
+          }
         })
       }
     } catch (err: any) {
-      if (err instanceof AuthError) {
-        navigate('/auth/login', { state: { next: `/post/view/${postID}` } })
-      } else {
-        setErrorMessage(err.message)
-      }
+      console.error(
+        'An error occurred while calling apiHandler',
+        'Comments - addComment'
+      )
     }
   }
 
@@ -226,13 +233,6 @@ const CommentBox = ({
             Submit
           </Button>
         </Grid>
-      </Grid>
-      <Grid>
-        {errorMessage && (
-          <Typography variant='body1' color='error'>
-            {errorMessage}
-          </Typography>
-        )}
       </Grid>
     </Box>
   )

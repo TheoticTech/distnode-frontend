@@ -35,44 +35,59 @@ const ProfileEdit = () => {
   React.useEffect(() => {
     const getActiveUserID = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
-            withCredentials: true
-          })
-          setActiveUserID(data.userID)
-          if (data.userID !== userID) {
-            navigate(-1)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/id`,
+              {
+                withCredentials: true
+              }
+            )
+            setActiveUserID(data.userID)
+            if (data.userID !== userID) {
+              console.error(
+                'Not authorized to edit this profile. Returning to previous page.'
+              )
+              navigate(-1)
+            }
+          },
+          onError: () => {
+            navigate('/auth/login', { state: { next: `/user/edit/${userID}` } })
           }
         })
       } catch (err: any) {
-        console.log('Not logged in. Requesting login now.')
-        navigate('/auth/login')
+        console.error(
+          'An error occurred while calling apiHandler',
+          'ProfileEdit - getActiveUserID'
+        )
       }
     }
 
     const getUserData = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(
-            `${REACT_APP_API_URL}/api/user/${userID}/profile`,
-            {}
-          )
-          const { bio, avatar } = data.user
-          setBio(bio)
-          setAvatar(avatar)
-        })
-      } catch (err: any) {
-        const getUserProfileError = err.response?.data?.getUserProfileError
-        if (getUserProfileError && err.response?.status === 404) {
-          setErrorMessage('User not found.')
-        } else {
-          if (err.message) {
-            setErrorMessage(err.message)
-          } else {
-            setErrorMessage(err)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/${userID}/profile`,
+              {}
+            )
+            const { bio, avatar } = data.user
+            setBio(bio)
+            setAvatar(avatar)
+          },
+          onError: ({ error }: any) => {
+            const getUserProfileError =
+              error.response?.data?.getUserProfileError
+            if (getUserProfileError && error.response?.status === 404) {
+              setErrorMessage('User not found.')
+            } else {
+              setErrorMessage(
+                'Unable to get user profile, please try again later.'
+              )
+            }
           }
-        }
-      }
+        })
+      } catch (err: any) {}
     }
 
     getActiveUserID()
@@ -81,17 +96,22 @@ const ProfileEdit = () => {
 
   const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      await apiHandler(async () => {
-        const fd = new FormData()
-        fd.append('media', e.target.files![0])
-        fd.append('csrfToken', Cookies.get('csrfToken') as string)
-        const response: any = await axios({
-          method: 'post',
-          url: `${REACT_APP_API_URL}/api/media/upload`,
-          data: fd,
-          withCredentials: true
-        })
-        setAvatar(response.data.file.location)
+      await apiHandler({
+        apiCall: async () => {
+          const fd = new FormData()
+          fd.append('media', e.target.files![0])
+          fd.append('csrfToken', Cookies.get('csrfToken') as string)
+          const response: any = await axios({
+            method: 'post',
+            url: `${REACT_APP_API_URL}/api/media/upload`,
+            data: fd,
+            withCredentials: true
+          })
+          setAvatar(response.data.file.location)
+        },
+        onError: () => {
+          console.error('Unable to change image, please try again later.')
+        }
       })
     }
   }
@@ -103,31 +123,37 @@ const ProfileEdit = () => {
     const data = new FormData(editProfileData.currentTarget)
 
     try {
-      return await apiHandler(async () => {
-        await axios.post(
-          `${REACT_APP_API_URL}/api/user/${userID}/profile/edit`,
-          {
-            ...(data.get('bio') && { bio: data.get('bio') }),
-            ...(avatar !== DEFAULT_AVATAR_URL && { avatar }),
-            csrfToken: Cookies.get('csrfToken')
-          },
-          { withCredentials: true }
-        )
-        navigate(`/user/view/${userID}`)
+      return await apiHandler({
+        apiCall: async () => {
+          await axios.post(
+            `${REACT_APP_API_URL}/api/user/${userID}/profile/edit`,
+            {
+              ...(data.get('bio') && { bio: data.get('bio') }),
+              ...(avatar !== DEFAULT_AVATAR_URL && { avatar }),
+              csrfToken: Cookies.get('csrfToken')
+            },
+            { withCredentials: true }
+          )
+          navigate(`/user/view/${userID}`)
+        },
+        onError: ({ error }: any) => {
+          if (error instanceof AuthError) {
+            navigate('/auth/login')
+          } else {
+            const editProfileError = error.response?.data?.editProfileError
+            if (editProfileError) {
+              setErrorMessage(editProfileError)
+            } else {
+              setErrorMessage('Unable to edit profile, please try again later.')
+            }
+          }
+        }
       })
     } catch (err: any) {
-      if (err instanceof AuthError) {
-        navigate('/auth/login')
-      } else {
-        const editProfileError = err.response?.data?.editProfileError
-        if (editProfileError) {
-          setErrorMessage(editProfileError)
-        } else if (err.message) {
-          setErrorMessage(err.message)
-        } else {
-          setErrorMessage(err)
-        }
-      }
+      console.error(
+        'An error occurred while calling apiHandler',
+        'ProfileEdit - editProfile'
+      )
     }
   }
 

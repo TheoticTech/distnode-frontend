@@ -60,38 +60,56 @@ function ProfileView() {
   React.useEffect(() => {
     const getActiveUserID = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
-            withCredentials: true
-          })
-          setActiveUserID(data.userID)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/id`,
+              {
+                withCredentials: true
+              }
+            )
+            setActiveUserID(data.userID)
+          },
+          onError: () => {
+            console.log('Not logged in. Viewing in guest mode.')
+          }
         })
       } catch (err: any) {
-        console.log('Not logged in. Viewing in guest mode.')
+        console.error(
+          'An error occurred while calling apiHandler',
+          'ProfileView - getActiveUserID'
+        )
       }
     }
 
     const getProfileData = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(
-            `${REACT_APP_API_URL}/api/user/${userID}/profile`,
-            { withCredentials: true }
-          )
-          setUserInfo(data.user)
-          setPosts(data.posts)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/${userID}/profile`,
+              { withCredentials: true }
+            )
+            setUserInfo(data.user)
+            setPosts(data.posts)
+          },
+          onError: ({ error }: any) => {
+            const getUserProfileError =
+              error.response?.data?.getUserProfileError
+            if (getUserProfileError && error.response?.status === 404) {
+              setErrorMessage('User not found.')
+            } else {
+              console.error(
+                'Unable to get user profile. Please try again later.'
+              )
+            }
+          }
         })
       } catch (err: any) {
-        const getUserProfileError = err.response?.data?.getUserProfileError
-        if (getUserProfileError && err.response?.status === 404) {
-          setErrorMessage('User not found.')
-        } else {
-          if (err.message) {
-            setErrorMessage(err.message)
-          } else {
-            setErrorMessage(err)
-          }
-        }
+        console.error(
+          'An error occurred while calling apiHandler',
+          'ProfileView - getProfileData'
+        )
       }
     }
 

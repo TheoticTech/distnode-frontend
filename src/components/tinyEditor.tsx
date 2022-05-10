@@ -93,39 +93,49 @@ const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
               const reader = new FileReader()
               reader.onload = async function () {
                 try {
-                  await apiHandler(async () => {
-                    innerRef.current.dom.doc.mostRecentWindow.block(
-                      'Uploading file...'
-                    )
-                    const fd = new FormData()
-                    fd.append('media', file)
-                    fd.append('csrfToken', Cookies.get('csrfToken') as string)
-                    const response: any = await axios({
-                      method: 'post',
-                      url: `${REACT_APP_API_URL}/api/media/upload`,
-                      data: fd,
-                      withCredentials: true
-                    })
-                    innerRef.current.dom.doc.mostRecentWindow.unblock()
-                    callback(response.data.file.location, {
-                      title: response.data.file.originalname
-                    })
+                  await apiHandler({
+                    apiCall: async () => {
+                      innerRef.current.dom.doc.mostRecentWindow.block(
+                        'Uploading file...'
+                      )
+                      const fd = new FormData()
+                      fd.append('media', file)
+                      fd.append('csrfToken', Cookies.get('csrfToken') as string)
+                      const response: any = await axios({
+                        method: 'post',
+                        url: `${REACT_APP_API_URL}/api/media/upload`,
+                        data: fd,
+                        withCredentials: true
+                      })
+                      innerRef.current.dom.doc.mostRecentWindow.unblock()
+                      callback(response.data.file.location, {
+                        title: response.data.file.originalname
+                      })
+                    },
+                    onError: () => {
+                      console.error(
+                        'Unable to upload file, please try again later.'
+                      )
+                    }
                   })
-                } catch (e) {
-                  console.log('File selection failed: error during upload')
+                } catch (err: any) {
+                  console.error(
+                    'An error occurred while calling apiHandler',
+                    'tinyEditor - file_picker_callback'
+                  )
                   innerRef.current.dom.doc.mostRecentWindow.unblock()
                 }
               }
               reader.readAsDataURL(file)
             }
             input.click()
-          } catch (e) {
-            console.log('File selection failed.')
+          } catch (err: any) {
+            console.error('File selection failed')
           }
         },
         image_dimensions: false,
         setup: function (editor) {
-          // Remove/disable the 'Embed' and 'Advanced' media menu items
+          // Remove the 'Embed' and 'Advanced' media menu items
           editor.on('ExecCommand', (event) => {
             const command = event.command
             if (command === 'mceMedia') {

@@ -94,117 +94,137 @@ function PostView({ helmetContext }: any) {
   const confirmDeletePost = async (postID: number) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        // First, ensure user has fresh CSRF token
-        await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
-          withCredentials: true
-        })
-        // Then, delete post
-        await apiHandler(async () => {
-          await axios.delete(
-            `${REACT_APP_API_URL}/api/posts/delete/${postID}`,
-            {
-              data: {
-                csrfToken: Cookies.get('csrfToken')
-              },
-              withCredentials: true
+        await apiHandler({
+          apiCall: async () => {
+            await axios.delete(
+              `${REACT_APP_API_URL}/api/posts/delete/${postID}`,
+              {
+                data: {
+                  csrfToken: Cookies.get('csrfToken')
+                },
+                withCredentials: true
+              }
+            )
+            navigate('/')
+          },
+          onError: ({ error }: any) => {
+            const deletePostError = error.response?.data?.deletePostError
+            if (deletePostError) {
+              setErrorMessage(deletePostError)
+            } else {
+              setErrorMessage('Unable to delete post, please try again later.')
             }
-          )
-          navigate('/')
+          }
         })
       } catch (err: any) {
-        const deletePostError = err.response?.data?.deletePostError
-        if (deletePostError) {
-          setErrorMessage(deletePostError)
-        } else {
-          setErrorMessage('An unknown error occurred, please try again later')
-        }
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostView - confirmDeletePost'
+        )
       }
     }
   }
 
   const getCommentData = async () => {
     try {
-      return await apiHandler(async () => {
-        const { data } = await axios.get(
-          `${REACT_APP_API_URL}/api/post/${postID}/comments/`,
-          {}
-        )
-        setComments(data.comments)
+      return await apiHandler({
+        apiCall: async () => {
+          const { data } = await axios.get(
+            `${REACT_APP_API_URL}/api/post/${postID}/comments/`,
+            {}
+          )
+          setComments(data.comments)
+        }
       })
     } catch (err: any) {
-      const getCommentsError = err.response?.data?.getCommentsError
-      if (getCommentsError && err.response?.status === 404) {
-        setErrorMessage('Post not found.')
-      } else {
-        if (err.message) {
-          setErrorMessage(err.message)
-        } else {
-          setErrorMessage(err)
-        }
-      }
+      console.error(
+        'An error occurred while calling apiHandler',
+        'PostView - getCommentData'
+      )
     }
   }
 
   React.useEffect(() => {
     const getActiveUserID = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
-            withCredentials: true
-          })
-          setActiveUserID(data.userID)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/id`,
+              {
+                withCredentials: true
+              }
+            )
+            setActiveUserID(data.userID)
+          },
+          onError: () => {
+            console.log('Not logged in. Viewing in guest mode.')
+          }
         })
       } catch (err: any) {
-        console.log('Not logged in. Viewing in guest mode.')
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostView - getActiveUserID'
+        )
       }
     }
 
     const getPostData = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(
-            `${REACT_APP_API_URL}/api/post/${postID}/`,
-            {
-              withCredentials: true
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/post/${postID}/`,
+              {
+                withCredentials: true
+              }
+            )
+            setAuthorInfo(data.user)
+            setPost(data.post)
+          },
+          onError: ({ error }: any) => {
+            const getPostError = error.response?.data?.getPostError
+            if (getPostError && error.response?.status === 404) {
+              setErrorMessage('Post not found.')
+            } else {
+              setErrorMessage('Unable to get post, please try again later.')
             }
-          )
-          setAuthorInfo(data.user)
-          setPost(data.post)
+          }
         })
       } catch (err: any) {
-        const getPostError = err.response?.data?.getPostError
-        if (getPostError && err.response?.status === 404) {
-          setErrorMessage('Post not found.')
-        } else {
-          if (err.message) {
-            setErrorMessage(err.message)
-          } else {
-            setErrorMessage(err)
-          }
-        }
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostView - getPostData'
+        )
       }
     }
 
     const getOtherAuthorPostsData = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(
-            `${REACT_APP_API_URL}/api/post/${postID}/related/author`,
-            { withCredentials: true }
-          )
-          setAuthorPosts(data.posts)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/post/${postID}/related/author`,
+              { withCredentials: true }
+            )
+            setAuthorPosts(data.posts)
+          },
+          onError: ({ error }: any) => {
+            const getPostsError = error.response?.data?.getPostsError
+            if (getPostsError && error.response?.status === 404) {
+              setErrorMessage('Post not found.')
+            } else {
+              console.error(
+                'Unable to get other author posts. Please try again later.'
+              )
+            }
+          }
         })
       } catch (err: any) {
-        const getPostsError = err.response?.data?.getPostsError
-        if (getPostsError && err.response?.status === 404) {
-          setErrorMessage('Post not found.')
-        } else {
-          if (err.message) {
-            setErrorMessage(err.message)
-          } else {
-            setErrorMessage(err)
-          }
-        }
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostView - getOtherAuthorPostsData'
+        )
       }
     }
 

@@ -11,44 +11,21 @@ class AuthError extends Error {
   }
 }
 
-const apiHandler = async (apiCall: any) => {
+const apiHandler = async ({
+  refreshToken = true,
+  apiCall,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onError = () => {}
+}: any) => {
   try {
-    return await apiCall()
-  } catch (apiCallError: any) {
-    const apiCallAuthError = apiCallError.response?.data?.authError
-    const apiCallCSRFError = apiCallError.response?.data?.csrfError
-    if (apiCallAuthError) {
-      if (apiCallAuthError === 'Expired access token') {
-        console.log('Access token has expired. Attempting to refresh now...')
-        try {
-          await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
-            withCredentials: true
-          })
-        } catch (refreshError: any) {
-          throw new AuthError('Unable to refresh access token.')
-        }
-
-        return await apiCall()
-      } else {
-        throw new AuthError('Invalid or missing access token.')
-      }
-    } else if (apiCallCSRFError) {
-      if (apiCallCSRFError === 'Expired CSRF token') {
-        console.log('CSRF token has expired. Attempting to refresh now...')
-        try {
-          await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
-            withCredentials: true
-          })
-        } catch (refreshError: any) {
-          throw new AuthError('Unable to refresh CSRF token.')
-        }
-        return await apiCall()
-      } else {
-        throw new AuthError('Invalid or missing CSRF token.')
-      }
-    } else {
-      throw apiCallError
+    if (refreshToken) {
+      await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
+        withCredentials: true
+      })
     }
+    return await apiCall()
+  } catch (err) {
+    await onError({ error: err })
   }
 }
 

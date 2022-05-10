@@ -52,17 +52,28 @@ const PostAdd = () => {
   React.useEffect(() => {
     const getActiveUserID = async () => {
       try {
-        return await apiHandler(async () => {
-          const { data } = await axios.get(`${REACT_APP_API_URL}/api/user/id`, {
-            withCredentials: true
-          })
-          setActiveUserID(data.userID)
+        return await apiHandler({
+          apiCall: async () => {
+            const { data } = await axios.get(
+              `${REACT_APP_API_URL}/api/user/id`,
+              {
+                withCredentials: true
+              }
+            )
+            setActiveUserID(data.userID)
+          },
+          onError: ({ error }: any) => {
+            console.error('Not logged in. Requesting login now.')
+            navigate('/auth/login', {
+              state: { next: `/post/add/?type=${searchParams.get('type')}` }
+            })
+          }
         })
       } catch (err: any) {
-        console.log('Not logged in. Requesting login now.')
-        navigate('/auth/login', {
-          state: { next: `/post/add/?type=${searchParams.get('type')}` }
-        })
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostAdd - getActiveUserID'
+        )
       }
     }
     getActiveUserID()
@@ -70,17 +81,22 @@ const PostAdd = () => {
 
   const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      await apiHandler(async () => {
-        const fd = new FormData()
-        fd.append('media', e.target.files![0])
-        fd.append('csrfToken', Cookies.get('csrfToken') as string)
-        const response: any = await axios({
-          method: 'post',
-          url: `${REACT_APP_API_URL}/api/media/upload`,
-          data: fd,
-          withCredentials: true
-        })
-        setThumbnail(response.data.file.location)
+      await apiHandler({
+        apiCall: async () => {
+          const fd = new FormData()
+          fd.append('media', e.target.files![0])
+          fd.append('csrfToken', Cookies.get('csrfToken') as string)
+          const response: any = await axios({
+            method: 'post',
+            url: `${REACT_APP_API_URL}/api/media/upload`,
+            data: fd,
+            withCredentials: true
+          })
+          setThumbnail(response.data.file.location)
+        },
+        onError: () => {
+          console.error('Unable to change image, please try again later.')
+        }
       })
     }
   }
@@ -98,20 +114,36 @@ const PostAdd = () => {
         if (!content) {
           setErrorMessage('Post body must not be empty')
         } else {
-          return await apiHandler(async () => {
-            await axios.post(
-              `${REACT_APP_API_URL}/api/posts/add`,
-              {
-                title: data.get('title'),
-                description: data.get('description'),
-                body: editorRef.current.getContent(),
-                published: data.get('publish') === 'on',
-                ...(thumbnail !== null && { thumbnail }),
-                csrfToken: Cookies.get('csrfToken')
-              },
-              { withCredentials: true }
-            )
-            navigate('/')
+          return await apiHandler({
+            apiCall: async () => {
+              await axios.post(
+                `${REACT_APP_API_URL}/api/posts/add`,
+                {
+                  title: data.get('title'),
+                  description: data.get('description'),
+                  body: editorRef.current.getContent(),
+                  published: data.get('publish') === 'on',
+                  ...(thumbnail !== null && { thumbnail }),
+                  csrfToken: Cookies.get('csrfToken')
+                },
+                { withCredentials: true }
+              )
+              navigate('/')
+            },
+            onError: ({ error }: any) => {
+              if (error instanceof AuthError) {
+                navigate('/auth/login')
+              } else {
+                const addPostError = error.response?.data?.addPostError
+                if (addPostError) {
+                  setErrorMessage(addPostError)
+                } else {
+                  setErrorMessage(
+                    'Unable to add blog post, please try again later.'
+                  )
+                }
+              }
+            }
           })
         }
       } else if (postType === 'link') {
@@ -119,51 +151,63 @@ const PostAdd = () => {
         if (!link) {
           setErrorMessage('Link URL must not be empty')
         } else {
-          const prerenderResponse = await apiHandler(async () => {
-            return await axios.get(
-              `${REACT_APP_API_URL}/api/prerender?url=${link}`,
-              { withCredentials: true }
-            )
+          const prerenderResponse = await apiHandler({
+            apiCall: async () => {
+              return await axios.get(
+                `${REACT_APP_API_URL}/api/prerender?url=${link}`,
+                { withCredentials: true }
+              )
+            },
+            onError: () => {
+              setErrorMessage(
+                'Unable to prerender link, please try again later.'
+              )
+            }
           })
           const prerenderData = prerenderResponse.data
           if (!prerenderData.title || !prerenderData.description) {
-            setErrorMessage('Unable to prerender provided link')
+            setErrorMessage(
+              'Prerendering is not supported for the provided link.'
+            )
           } else {
             const { title, description, image } = prerenderData
-            return await apiHandler(async () => {
-              await axios.post(
-                `${REACT_APP_API_URL}/api/posts/add`,
-                {
-                  title,
-                  description,
-                  body: `<p><a href="${link}" target="_blank">${link}</a></p>`,
-                  published: data.get('publish') === 'on',
-                  ...(image !== null && { thumbnail: image }),
-                  csrfToken: Cookies.get('csrfToken')
-                },
-                { withCredentials: true }
-              )
-              navigate('/')
+            return await apiHandler({
+              apiCall: async () => {
+                await axios.post(
+                  `${REACT_APP_API_URL}/api/posts/add`,
+                  {
+                    title,
+                    description,
+                    body: `<p><a href="${link}" target="_blank">${link}</a></p>`,
+                    published: data.get('publish') === 'on',
+                    ...(image !== null && { thumbnail: image }),
+                    csrfToken: Cookies.get('csrfToken')
+                  },
+                  { withCredentials: true }
+                )
+                navigate('/')
+              },
+              onError: ({ error }: any) => {
+                if (error instanceof AuthError) {
+                  navigate('/auth/login')
+                } else {
+                  const addPostError = error.response?.data?.addPostError
+                  if (addPostError) {
+                    setErrorMessage(addPostError)
+                  } else {
+                    setErrorMessage(
+                      'Unable to add link post, please try again later.'
+                    )
+                  }
+                }
+              }
             })
           }
         }
       }
     } catch (err: any) {
-      if (err instanceof AuthError) {
-        navigate('/auth/login')
-      } else {
-        const addPostError = err.response?.data?.addPostError
-        const prerenderError = err.response?.data?.prerenderError
-        if (addPostError) {
-          setErrorMessage(addPostError)
-        } else if (prerenderError) {
-          setErrorMessage(prerenderError)
-        } else {
-          setErrorMessage(
-            'An error occurred. Please ensure post is formed correctly, or try again later'
-          )
-        }
-      }
+      setErrorMessage('Unable to add post, please try again later')
+      console.error('Unable to add post, please try again later')
     } finally {
       setLoading(false)
     }

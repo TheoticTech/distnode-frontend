@@ -28,7 +28,7 @@ import { apiHandler } from '../utils/apiHandler'
 import { react } from '../utils/react'
 
 // Configurations
-import { REACT_APP_AUTH_URL, REACT_APP_API_URL } from '../config'
+import { REACT_APP_API_URL } from '../config'
 
 function PostCard({
   activeUserID,
@@ -73,30 +73,28 @@ function PostCard({
   const confirmDeletePost = async (postID: number) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        // First, ensure user has fresh CSRF token
-        await axios.get(`${REACT_APP_AUTH_URL}/auth/refreshed-tokens`, {
-          withCredentials: true
-        })
-        // Then, delete post
-        await apiHandler(async () => {
-          await axios.delete(
-            `${REACT_APP_API_URL}/api/posts/delete/${postID}`,
-            {
-              data: {
-                csrfToken: Cookies.get('csrfToken')
-              },
-              withCredentials: true
-            }
-          )
-          navigate(0)
+        await apiHandler({
+          apiCall: async () => {
+            await axios.delete(
+              `${REACT_APP_API_URL}/api/posts/delete/${postID}`,
+              {
+                data: {
+                  csrfToken: Cookies.get('csrfToken')
+                },
+                withCredentials: true
+              }
+            )
+            navigate(0)
+          },
+          onError: () => {
+            console.error('Unable to delete post, please try again later.')
+          }
         })
       } catch (err: any) {
-        const deletePostError = err.response?.data?.deletePostError
-        if (deletePostError) {
-          setErrorMessage(deletePostError)
-        } else {
-          setErrorMessage('An unknown error occurred, please try again later')
-        }
+        console.error(
+          'An error occurred while calling apiHandler',
+          'PostCard - confirmDeletePost'
+        )
       }
     }
   }
