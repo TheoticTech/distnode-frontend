@@ -35,11 +35,7 @@ import { react } from '../utils/react'
 import '../style/base.css'
 
 // Configurations
-import {
-  REACT_APP_API_URL,
-  REACT_APP_AUTH_URL,
-  REACT_APP_STATIC_URL
-} from '../config'
+import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
 
 function PostView({ helmetContext }: any) {
   const navigate = useNavigate()

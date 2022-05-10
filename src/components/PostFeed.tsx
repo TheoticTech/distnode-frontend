@@ -12,7 +12,8 @@ function PostFeed({
   posts,
   activeUserID,
   onPostReaction,
-  onLastIsVisible
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onLastIsVisible = () => {}
 }: any) {
   const { values: breakpointValues } = baseTheme.breakpoints
   const breakpointCols = {
