@@ -87,7 +87,12 @@ const ProfileEdit = () => {
             }
           }
         })
-      } catch (err: any) {}
+      } catch (err: any) {
+        console.error(
+          'An error occurred while calling apiHandler',
+          'ProfileEdit - getUserData'
+        )
+      }
     }
 
     getActiveUserID()
