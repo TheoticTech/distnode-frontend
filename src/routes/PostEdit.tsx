@@ -40,6 +40,7 @@ const PostEdit = () => {
   const [errorMessage, setErrorMessage] = React.useState('')
   const { postID } = useParams() // postID from URL
   const editorRef = React.useRef<any>(null)
+  const [body, setBody] = React.useState('')
 
   React.useEffect(() => {
     const getActiveUserID = async () => {
@@ -134,7 +135,7 @@ const PostEdit = () => {
               `${REACT_APP_API_URL}/api/posts/edit/${postID}`,
               {
                 ...post,
-                body: editorRef.current.getContent(),
+                body,
                 csrfToken: Cookies.get('csrfToken')
               },
               { withCredentials: true }
@@ -243,7 +244,11 @@ const PostEdit = () => {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <TinyEditor innerRef={editorRef} initialValue={post.body} />
+                    <TinyEditor
+                      innerRef={editorRef}
+                      initialValue={post.body}
+                      onEditorChange={(newBody: string) => setBody(newBody)}
+                    />
                   </Grid>
                   <Grid
                     item

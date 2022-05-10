@@ -9,7 +9,7 @@ import { apiHandler } from '../utils/apiHandler'
 // Configurations
 import { REACT_APP_API_URL, REACT_APP_STATIC_URL } from '../config'
 
-const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
+const TinyEditor = ({ innerRef, initialValue = '', onEditorChange }: any) => {
   return (
     <Editor
       // Files here need to have a recursive, public ACL
@@ -17,6 +17,7 @@ const TinyEditor = ({ innerRef, initialValue = '' }: any) => {
       tinymceScriptSrc={`${REACT_APP_STATIC_URL}/tinymce/js/tinymce/tinymce.min.js`}
       onInit={(evt, editor) => (innerRef.current = editor)}
       initialValue={initialValue}
+      onEditorChange={onEditorChange}
       init={{
         skin: 'oxide-dark',
         content_css: 'dark',

@@ -45,7 +45,7 @@ function Home() {
             setPosts((currentPosts) => [...currentPosts, ...data.posts])
           }
         },
-        onError: ({ error }: any) => {
+        onError: () => {
           setHasError(true)
         }
       })

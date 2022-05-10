@@ -39,6 +39,7 @@ const PostAdd = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [postType, setPostType] = React.useState('blog')
   const [loading, setLoading] = React.useState(false)
+  const [body, setBody] = React.useState('')
 
   React.useEffect(() => {
     const postType = searchParams.get('type') || ''
@@ -121,7 +122,7 @@ const PostAdd = () => {
                 {
                   title: data.get('title'),
                   description: data.get('description'),
-                  body: editorRef.current.getContent(),
+                  body,
                   published: data.get('publish') === 'on',
                   ...(thumbnail !== null && { thumbnail }),
                   csrfToken: Cookies.get('csrfToken')
@@ -293,7 +294,12 @@ const PostAdd = () => {
                           />
                         </Grid>
                         <Grid item xs={12}>
-                          <TinyEditor innerRef={editorRef} />
+                          <TinyEditor
+                            innerRef={editorRef}
+                            onEditorChange={(newBody: string) => {
+                              setBody(newBody)
+                            }}
+                          />
                         </Grid>
                       </>
                     )}
