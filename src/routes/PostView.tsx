@@ -128,6 +128,7 @@ function PostView({ helmetContext }: any) {
   const getCommentData = async () => {
     try {
       return await apiHandler({
+        refreshToken: false,
         apiCall: async () => {
           const { data } = await axios.get(
             `${REACT_APP_API_URL}/api/post/${postID}/comments/`,
@@ -172,6 +173,7 @@ function PostView({ helmetContext }: any) {
     const getPostData = async () => {
       try {
         return await apiHandler({
+          refreshToken: false,
           apiCall: async () => {
             const { data } = await axios.get(
               `${REACT_APP_API_URL}/api/post/${postID}/`,
@@ -202,6 +204,7 @@ function PostView({ helmetContext }: any) {
     const getOtherAuthorPostsData = async () => {
       try {
         return await apiHandler({
+          refreshToken: false,
           apiCall: async () => {
             const { data } = await axios.get(
               `${REACT_APP_API_URL}/api/post/${postID}/related/author`,
