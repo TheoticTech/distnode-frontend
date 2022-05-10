@@ -85,6 +85,7 @@ function ProfileView() {
     const getProfileData = async () => {
       try {
         return await apiHandler({
+          refreshToken: false,
           apiCall: async () => {
             const { data } = await axios.get(
               `${REACT_APP_API_URL}/api/user/${userID}/profile`,
