@@ -14,6 +14,7 @@ import Link from '@mui/material/Link'
 import MinusSquare from '@mui/icons-material/IndeterminateCheckBoxOutlined'
 import moment from 'moment'
 import PlusSquare from '@mui/icons-material/AddBoxOutlined'
+import Popover from '@mui/material/Popover'
 import TextField from '@mui/material/TextField'
 import TreeView from '@mui/lab/TreeView'
 import Typography from '@mui/material/Typography'
@@ -127,10 +128,21 @@ const CommentBox = ({
   postID,
   onCommentChange,
   rootComment,
-  navigate
+  navigate,
+  activeUserID
 }: any) => {
   const [isActive, setIsActive] = React.useState(false)
   const [commentText, setCommentText] = React.useState('')
+  const [popoverAnchorEl, setPopoverAnchorEl] =
+    React.useState<null | HTMLElement>(null)
+  const handlePopoverClick = (event: React.MouseEvent<HTMLElement>) => {
+    setPopoverAnchorEl(popoverAnchorEl ? null : event.currentTarget)
+  }
+  const handlePopoverClose = () => {
+    setPopoverAnchorEl(null)
+  }
+  const popoverOpen = Boolean(popoverAnchorEl)
+  const id = popoverOpen ? 'simple-popover' : undefined
 
   const addComment = async (
     commentData: React.FormEvent<HTMLFormElement>,
@@ -206,10 +218,28 @@ const CommentBox = ({
             label={label}
             name='commentText'
             value={commentText}
-            onChange={(e) => {
-              setCommentText(e.target.value)
+            onChange={(e: any) => {
+              if (!activeUserID) {
+                handlePopoverClick(e)
+              } else {
+                setCommentText(e.target.value)
+              }
             }}
           />
+          <Popover
+            id={id}
+            open={popoverOpen}
+            anchorEl={popoverAnchorEl}
+            onClose={handlePopoverClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left'
+            }}
+          >
+            <Typography sx={{ p: 2 }}>
+              <Link href={'/auth/login'}>Login</Link> to comment
+            </Typography>
+          </Popover>
         </Grid>
         <Grid
           item
@@ -375,6 +405,7 @@ const renderTreeItems = (
                 postID={postID}
                 rootComment={node.id}
                 navigate={navigate}
+                activeUserID={activeUserID}
               />
             )}
           </Grid>
@@ -431,6 +462,7 @@ const Comments = ({ comments, onCommentChange, postID, activeUserID }: any) => {
         onCommentChange={onCommentChange}
         postID={postID}
         navigate={navigate}
+        activeUserID={activeUserID}
       />
       {parsedComments.length > 0 && (
         <TreeView
